@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>рџЋѓ РҐСЌР»Р»РѕСѓРёРЅ: РџСѓС‚СЊ РўС‹РєРІС‹ вЂ” Python Edition рџђЌ</title>
+<title>🎃 Хэллоуин: Путь Тыквы — Python Edition 🐍</title>
 <style>
     * { box-sizing: border-box; }
     body {
@@ -173,7 +173,7 @@
         font-size: 12px;
     }
 
-    /* РњРћР”РђР›Р¬РќРћР• РћРљРќРћ */
+    /* МОДАЛЬНОЕ ОКНО */
     #victory-overlay {
         position: fixed;
         top: 0; left: 0;
@@ -261,9 +261,9 @@
 </head>
 <body>
 
-<h1>рџЋѓ РҐСЌР»Р»РѕСѓРёРЅ: РџСѓС‚СЊ РўС‹РєРІС‹ рџђЌ</h1>
-<div class="subtitle">Python Edition вЂ” СѓРїСЂР°РІР»СЏР№ С‚С‹РєРІРѕР№ СЃ РїРѕРјРѕС‰СЊСЋ РєРѕРґР°!</div>
-<div id="level-info">РЈСЂРѕРІРµРЅСЊ 1</div>
+<h1>🎃 Хэллоуин: Путь Тыквы 🐍</h1>
+<div class="subtitle">Python Edition — управляй тыквой с помощью кода!</div>
+<div id="level-info">Уровень 1</div>
 
 <div id="game-container">
     <div id="grid"></div>
@@ -271,25 +271,25 @@
         <div id="vars-panel"></div>
         
         <div id="code-editor">
-            <textarea id="code" spellcheck="false" placeholder="# РќР°РїРёС€Рё СЃРІРѕР№ РєРѕРґ РЅР° Python!"></textarea>
+            <textarea id="code" spellcheck="false" placeholder="# Напиши свой код на Python!"></textarea>
         </div>
         
         <div class="buttons">
-            <button class="btn-run" id="btn-run" onclick="runCode()">в–¶ Р—Р°РїСѓСЃС‚РёС‚СЊ</button>
-            <button class="btn-reset" onclick="resetLevel()">рџ”„ РЎР±СЂРѕСЃ</button>
-            <button class="btn-clear" onclick="clearCode()">рџ—‘ РћС‡РёСЃС‚РёС‚СЊ</button>
+            <button class="btn-run" id="btn-run" onclick="runCode()">▶ Запустить</button>
+            <button class="btn-reset" onclick="resetLevel()">🔄 Сброс</button>
+            <button class="btn-clear" onclick="clearCode()">🗑 Очистить</button>
         </div>
         
         <div class="speed-control">
-            <span>рџђў РЎРєРѕСЂРѕСЃС‚СЊ:</span>
+            <span>🐢 Скорость:</span>
             <input type="range" id="speed" min="50" max="600" value="250" step="50">
-            <span>рџђ‡</span>
+            <span>🐇</span>
         </div>
         
         <div class="legend">
-            рџЋѓ вЂ” РўС‹РєРІР° (С‚С‹) &nbsp;|&nbsp; рџЌ¬ вЂ” РљРѕРЅС„РµС‚Р° &nbsp;|&nbsp; рџљЄ вЂ” Р’С‹С…РѕРґ &nbsp;|&nbsp; рџЄ¦ вЂ” РЎС‚РµРЅР°<br>
-            РЈРїСЂР°РІР»СЏР№ РїРѕР·РёС†РёРµР№ С‡РµСЂРµР· РїРµСЂРµРјРµРЅРЅС‹Рµ <code>x</code> Рё <code>y</code><br>
-            РџРѕРґРґРµСЂР¶РёРІР°РµС‚СЃСЏ: <code>if</code>, <code>for</code>, <code>while</code>, <code>print()</code>, Р°СЂРёС„РјРµС‚РёРєР°
+            🎃 — Тыква (ты) &nbsp;|&nbsp; 🍬 — Конфета &nbsp;|&nbsp; 🚪 — Выход &nbsp;|&nbsp; 🪦 — Стена<br>
+            Управляй позицией через переменные <code>x</code> и <code>y</code><br>
+            Поддерживается: <code>if</code>, <code>for</code>, <code>while</code>, <code>print()</code>, арифметика
         </div>
     </div>
 </div>
@@ -298,20 +298,20 @@
 
 <div id="victory-overlay">
     <div id="victory-modal">
-        <div class="victory-title" id="victory-title">рџЋ‰ РЈР РћР’Р•РќР¬ РџР РћР™Р”Р•Рќ! рџЋ‰</div>
-        <div class="victory-emoji" id="victory-emoji">рџЋѓрџЌ¬рџЋѓ</div>
+        <div class="victory-title" id="victory-title">🎉 УРОВЕНЬ ПРОЙДЕН! 🎉</div>
+        <div class="victory-emoji" id="victory-emoji">🎃🍬🎃</div>
         <div class="victory-message" id="victory-message"></div>
         <div class="victory-stats" id="victory-stats"></div>
-        <button class="btn-victory" id="btn-victory">вћЎ РЎР»РµРґСѓСЋС‰РёР№ СѓСЂРѕРІРµРЅСЊ</button>
+        <button class="btn-victory" id="btn-victory">➡ Следующий уровень</button>
     </div>
 </div>
 
 <script>
-// ==================== РЈР РћР’РќР ====================
+// ==================== УРОВНИ ====================
 const levels = [
     {
-        name: "РЈСЂРѕРІРµРЅСЊ 1: РўС‹РєРІРµРЅРЅС‹Р№ РїРµСЂРµСѓР»РѕРє (4Г—4)",
-        task: "Р”РѕР№РґРё РґРѕ РІС‹С…РѕРґР°, СЃРѕР±РёСЂР°СЏ РєРѕРЅС„РµС‚С‹",
+        name: "Уровень 1: Тыквенный переулок (4×4)",
+        task: "Дойди до выхода, собирая конфеты",
         map: [
             [4, 0, 0, 0],
             [1, 1, 0, 1],
@@ -319,15 +319,15 @@ const levels = [
             [0, 1, 0, 3]
         ],
         startDir: 2,
-        hint: `# РџСЂРѕСЃС‚РѕР№ РїСѓС‚СЊ: РІРїСЂР°РІРѕ, РІРЅРёР·, РІР»РµРІРѕ, РІРІРµСЂС…
+        hint: `# Простой путь: вправо, вниз, влево, вверх
 x = x + 1
 y = y + 1
 x = x - 1
 y = y - 1`
     },
     {
-        name: "РЈСЂРѕРІРµРЅСЊ 2: Р—Р°Р±СЂРѕС€РµРЅРЅРѕРµ РєР»Р°РґР±РёС‰Рµ (5Г—5)",
-        task: "РЎРѕР±РµСЂРё 2 РєРѕРЅС„РµС‚С‹ Рё РЅР°Р№РґРё РІС‹С…РѕРґ",
+        name: "Уровень 2: Заброшенное кладбище (5×5)",
+        task: "Собери 2 конфеты и найди выход",
         map: [
             [4, 0, 0, 0, 0],
             [1, 1, 0, 1, 0],
@@ -339,8 +339,8 @@ y = y - 1`
         hint: ``
     },
     {
-        name: "РЈСЂРѕРІРµРЅСЊ 3: Р”РѕРј СЃ РїСЂРёРІРёРґРµРЅРёСЏРјРё (6Г—6)",
-        task: "3 РєРѕРЅС„РµС‚С‹! РСЃРїРѕР»СЊР·СѓР№ СѓСЃР»РѕРІРёСЏ",
+        name: "Уровень 3: Дом с привидениями (6×6)",
+        task: "3 конфеты! Используй условия",
         map: [
             [4, 0, 1, 0, 0, 0],
             [0, 0, 1, 0, 1, 0],
@@ -350,13 +350,13 @@ y = y - 1`
             [0, 1, 2, 0, 0, 3]
         ],
         startDir: 2,
-        hint: `# РСЃРїРѕР»СЊР·СѓР№ С†РёРєР» for
+        hint: `# Используй цикл for
 for i in range(3):
     y = y + 1`
     },
     {
-        name: "РЈСЂРѕРІРµРЅСЊ 4: Р›РµСЃРЅР°СЏ С‚СЂРѕРїР° (7Г—5)",
-        task: "3 РєРѕРЅС„РµС‚С‹ вЂ” РЅСѓР¶РµРЅ while!",
+        name: "Уровень 4: Лесная тропа (7×5)",
+        task: "3 конфеты — нужен while!",
         map: [
             [4, 0, 0, 0, 0, 0, 0],
             [0, 1, 0, 1, 1, 0, 1],
@@ -368,8 +368,8 @@ for i in range(3):
         hint: ``
     },
     {
-        name: "РЈСЂРѕРІРµРЅСЊ 5: Р—Р°РјРѕРє Р”СЂР°РєСѓР»С‹ (8Г—8)",
-        task: "5 РєРѕРЅС„РµС‚! РџРёС€Рё С„СѓРЅРєС†РёРё...",
+        name: "Уровень 5: Замок Дракулы (8×8)",
+        task: "5 конфет! Пиши функции...",
         map: [
             [4, 0, 1, 0, 0, 0, 1, 0],
             [0, 0, 1, 0, 1, 0, 1, 0],
@@ -381,13 +381,13 @@ for i in range(3):
             [1, 0, 1, 0, 1, 0, 0, 3]
         ],
         startDir: 2,
-        hint: `# while РїРѕРјРѕР¶РµС‚ РґРІРёРіР°С‚СЊСЃСЏ РґРѕ РіСЂР°РЅРёС†С‹
+        hint: `# while поможет двигаться до границы
 while x < 5:
     x = x + 1`
     },
     {
-        name: "РЈСЂРѕРІРµРЅСЊ 6: РџРѕРґР·РµРјРµР»СЊРµ РІР°РјРїРёСЂРѕРІ (9Г—9)",
-        task: "4 РєРѕРЅС„РµС‚С‹ вЂ” РёСЃРїРѕР»СЊР·СѓР№ РІР»РѕР¶РµРЅРЅС‹Рµ С†РёРєР»С‹",
+        name: "Уровень 6: Подземелье вампиров (9×9)",
+        task: "4 конфеты — используй вложенные циклы",
         map: [
             [4, 0, 0, 0, 1, 0, 0, 0, 0],
             [1, 1, 0, 0, 1, 0, 1, 1, 0],
@@ -403,8 +403,8 @@ while x < 5:
         hint: ``
     },
     {
-        name: "РЈСЂРѕРІРµРЅСЊ 7: Р›РѕРіРѕРІРѕ Р¤СЂР°РЅРєРµРЅС€С‚РµР№РЅР° (10Г—10)",
-        task: "6 РєРѕРЅС„РµС‚! Р¤РёРЅР°Р»СЊРЅРѕРµ РёСЃРїС‹С‚Р°РЅРёРµ",
+        name: "Уровень 7: Логово Франкенштейна (10×10)",
+        task: "6 конфет! Финальное испытание",
         map: [
             [4, 0, 0, 1, 0, 0, 0, 1, 0, 0],
             [0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
@@ -422,7 +422,7 @@ while x < 5:
     }
 ];
 
-// ==================== РЎРћРЎРўРћРЇРќРР• РР“Р Р« ====================
+// ==================== СОСТОЯНИЕ ИГРЫ ====================
 let currentLevel = 0;
 let player = { x: 0, y: 0, dir: 2 };
 let mapData = [];
@@ -445,10 +445,10 @@ const btnVictory = document.getElementById('btn-victory');
 const btnRun = document.getElementById('btn-run');
 const speedEl = document.getElementById('speed');
 
-const arrows = ['в–І', 'в–¶', 'в–ј', 'в—Ђ'];
+const arrows = ['▲', '▶', '▼', '◀'];
 const dirNames = ['up', 'right', 'down', 'left'];
 
-// ==================== Р›РћР“РР РћР’РђРќРР• ====================
+// ==================== ЛОГИРОВАНИЕ ====================
 function log(msg, type = 'info') {
     const p = document.createElement('div');
     p.className = `log-${type}`;
@@ -458,7 +458,7 @@ function log(msg, type = 'info') {
 }
 function clearLog() { consoleEl.innerHTML = ''; }
 
-// ==================== РЈРџР РђР’Р›Р•РќРР• РЈР РћР’РќРЇРњР ====================
+// ==================== УПРАВЛЕНИЕ УРОВНЯМИ ====================
 function initLevel() {
     const level = levels[currentLevel];
     mapData = level.map.map(row => [...row]);
@@ -480,11 +480,11 @@ function initLevel() {
         }
     }
     
-    codeEl.value = level.hint || '# РќР°РїРёС€Рё РєРѕРґ Р·РґРµСЃСЊ\n';
+    codeEl.value = level.hint || '# Напиши код здесь\n';
     updateVarsPanel({ x: player.x, y: player.y });
     render();
-    log(`рџЋѓ РЈСЂРѕРІРµРЅСЊ РЅР°С‡Р°С‚! РЎРѕР±РµСЂРё РІСЃРµ рџЌ¬ (${totalCandies}) Рё РґРѕР±РµСЂРёСЃСЊ РґРѕ рџљЄ`, 'info');
-    log(`рџ’Ў РџРѕРґСЃРєР°Р·РєР°: РЅР°Р¶РјРё "РџСЂРёРјРµСЂ", С‡С‚РѕР±С‹ СѓРІРёРґРµС‚СЊ РіРѕС‚РѕРІС‹Р№ РєРѕРґ`, 'hint');
+    log(`🎃 Уровень начат! Собери все 🍬 (${totalCandies}) и доберись до 🚪`, 'info');
+    log(`💡 Подсказка: нажми "Пример", чтобы увидеть готовый код`, 'hint');
 }
 
 function resetLevel() {
@@ -499,16 +499,16 @@ function showHint() {
     const level = levels[currentLevel];
     if (level.hint) {
         codeEl.value = level.hint;
-        log('рџ’Ў РџСЂРёРјРµСЂ РєРѕРґР° Р·Р°РіСЂСѓР¶РµРЅ РІ СЂРµРґР°РєС‚РѕСЂ', 'hint');
+        log('💡 Пример кода загружен в редактор', 'hint');
     }
 }
 
 function clearCode() {
-    codeEl.value = '# РќР°РїРёС€Рё СЃРІРѕР№ РєРѕРґ Р·РґРµСЃСЊ\n';
-    log('рџ—‘ РљРѕРґ РѕС‡РёС‰РµРЅ', 'info');
+    codeEl.value = '# Напиши свой код здесь\n';
+    log('🗑 Код очищен', 'info');
 }
 
-// ==================== Р Р•РќР”Р•Р РРќР“ ====================
+// ==================== РЕНДЕРИНГ ====================
 function render() {
     gridEl.innerHTML = '';
     gridEl.style.gridTemplateColumns = `repeat(${mapData[0].length}, 55px)`;
@@ -518,12 +518,12 @@ function render() {
             const cell = document.createElement('div');
             cell.className = 'cell';
             const val = mapData[y][x];
-            if (val === 1) { cell.classList.add('wall'); cell.textContent = 'рџЄ¦'; }
-            else if (val === 2) cell.textContent = 'рџЌ¬';
-            else if (val === 3) cell.textContent = 'рџљЄ';
+            if (val === 1) { cell.classList.add('wall'); cell.textContent = '🪦'; }
+            else if (val === 2) cell.textContent = '🍬';
+            else if (val === 3) cell.textContent = '🚪';
 
             if (x === player.x && y === player.y) {
-                cell.textContent = 'рџЋѓ';
+                cell.textContent = '🎃';
                 cell.classList.add('player');
                 const ind = document.createElement('div');
                 ind.className = `dir-indicator dir-${dirNames[player.dir]}`;
@@ -543,7 +543,7 @@ function updateVarsPanel(vars) {
     varsPanelEl.innerHTML = html;
 }
 
-// ==================== РРќРўР•Р РџР Р•РўРђРўРћР  PYTHON-РџРћР”РћР‘РќРћР“Рћ РЇР—Р«РљРђ ====================
+// ==================== ИНТЕРПРЕТАТОР PYTHON-ПОДОБНОГО ЯЗЫКА ====================
 
 function getIndent(line) {
     const match = line.match(/^(\s*)/);
@@ -562,7 +562,7 @@ function findBlockEnd(lines, startIdx, parentIndent) {
     return i;
 }
 
-// РџР°СЂСЃРµСЂ РІС‹СЂР°Р¶РµРЅРёР№ (СЂРµРєСѓСЂСЃРёРІРЅС‹Р№ СЃРїСѓСЃРє)
+// Парсер выражений (рекурсивный спуск)
 function createExprEvaluator(vars) {
     return function evalExpr(exprStr) {
         let expr = exprStr.trim();
@@ -645,19 +645,19 @@ function createExprEvaluator(vars) {
                 else if (expr[pos] === '/') {
                     pos++;
                     const r = parseUnary();
-                    if (r === 0) throw new Error("Р”РµР»РµРЅРёРµ РЅР° РЅРѕР»СЊ");
+                    if (r === 0) throw new Error("Деление на ноль");
                     left = left / r;
                 }
                 else if (expr[pos] === '%') {
                     pos++;
                     const r = parseUnary();
-                    if (r === 0) throw new Error("Р”РµР»РµРЅРёРµ РЅР° РЅРѕР»СЊ (РѕСЃС‚Р°С‚РѕРє)");
+                    if (r === 0) throw new Error("Деление на ноль (остаток)");
                     left = left % r;
                 }
                 else if (expr.startsWith('//', pos)) {
                     pos += 2;
                     const r = parseUnary();
-                    if (r === 0) throw new Error("Р”РµР»РµРЅРёРµ РЅР° РЅРѕР»СЊ");
+                    if (r === 0) throw new Error("Деление на ноль");
                     left = Math.floor(left / r);
                 }
                 else break;
@@ -672,28 +672,28 @@ function createExprEvaluator(vars) {
         }
         function parsePrimary() {
             skipWS();
-            if (pos >= expr.length) throw new Error("РќРµРѕР¶РёРґР°РЅРЅС‹Р№ РєРѕРЅРµС† РІС‹СЂР°Р¶РµРЅРёСЏ");
+            if (pos >= expr.length) throw new Error("Неожиданный конец выражения");
             
-            // Р§РёСЃР»Рѕ
+            // Число
             if (/\d/.test(expr[pos]) || (expr[pos] === '.' && /\d/.test(expr[pos+1] || ''))) {
                 let numStr = '';
                 while (pos < expr.length && /[\d.]/.test(expr[pos])) numStr += expr[pos++];
                 const n = parseFloat(numStr);
-                if (isNaN(n)) throw new Error(`РќРµРІРµСЂРЅРѕРµ С‡РёСЃР»Рѕ: ${numStr}`);
+                if (isNaN(n)) throw new Error(`Неверное число: ${numStr}`);
                 return n;
             }
             
-            // РЎРєРѕР±РєРё
+            // Скобки
             if (expr[pos] === '(') {
                 pos++;
                 const val = parseExpr();
                 skipWS();
-                if (expr[pos] !== ')') throw new Error("РћР¶РёРґР°Р»Р°СЃСЊ ')'");
+                if (expr[pos] !== ')') throw new Error("Ожидалась ')'");
                 pos++;
                 return val;
             }
             
-            // РРјСЏ (РїРµСЂРµРјРµРЅРЅР°СЏ РёР»Рё С„СѓРЅРєС†РёСЏ) РёР»Рё РєР»СЋС‡РµРІРѕРµ СЃР»РѕРІРѕ
+            // Имя (переменная или функция) или ключевое слово
             if (/[a-zA-Z_]/.test(expr[pos])) {
                 let name = '';
                 while (pos < expr.length && /[a-zA-Z0-9_]/.test(expr[pos])) name += expr[pos++];
@@ -715,7 +715,7 @@ function createExprEvaluator(vars) {
                             else break;
                         }
                     }
-                    if (expr[pos] !== ')') throw new Error("РћР¶РёРґР°Р»Р°СЃСЊ ')' РїРѕСЃР»Рµ Р°СЂРіСѓРјРµРЅС‚РѕРІ С„СѓРЅРєС†РёРё");
+                    if (expr[pos] !== ')') throw new Error("Ожидалась ')' после аргументов функции");
                     pos++;
                     
                     if (name === 'abs') return Math.abs(args[0]);
@@ -724,33 +724,33 @@ function createExprEvaluator(vars) {
                     if (name === 'int') return Math.floor(args[0]);
                     if (name === 'round') return Math.round(args[0]);
                     if (name === 'pow') return Math.pow(args[0], args[1] || 0);
-                    throw new Error(`РќРµРёР·РІРµСЃС‚РЅР°СЏ С„СѓРЅРєС†РёСЏ: ${name}`);
+                    throw new Error(`Неизвестная функция: ${name}`);
                 }
                 
                 if (name in vars) return vars[name];
-                throw new Error(`РќРµРёР·РІРµСЃС‚РЅР°СЏ РїРµСЂРµРјРµРЅРЅР°СЏ: ${name}`);
+                throw new Error(`Неизвестная переменная: ${name}`);
             }
             
-            throw new Error(`РќРµРѕР¶РёРґР°РЅРЅС‹Р№ СЃРёРјРІРѕР»: '${expr[pos]}'`);
+            throw new Error(`Неожиданный символ: '${expr[pos]}'`);
         }
         
         try {
             const result = parseExpr();
             skipWS();
-            if (pos < expr.length) throw new Error(`РќРµРѕР¶РёРґР°РЅРЅС‹Р№ РѕСЃС‚Р°С‚РѕРє: '${expr.slice(pos)}'`);
+            if (pos < expr.length) throw new Error(`Неожиданный остаток: '${expr.slice(pos)}'`);
             return result;
         } catch (e) {
-            throw new Error(`РћС€РёР±РєР° РІ РІС‹СЂР°Р¶РµРЅРёРё '${exprStr}': ${e.message}`);
+            throw new Error(`Ошибка в выражении '${exprStr}': ${e.message}`);
         }
     };
 }
 
-// Р“Р»Р°РІРЅС‹Р№ РёРЅС‚РµСЂРїСЂРµС‚Р°С‚РѕСЂ
+// Главный интерпретатор
 function interpret(code, initialVars) {
     const lines = code.split('\n');
     const vars = { ...initialVars };
     const output = [];
-    const moves = []; // СЃРїРёСЃРѕРє {x, y} РїРѕСЃР»Рµ РєР°Р¶РґРѕРіРѕ РёР·РјРµРЅРµРЅРёСЏ x РёР»Рё y
+    const moves = []; // список {x, y} после каждого изменения x или y
     let steps = 0;
     const MAX_STEPS = 50000;
     
@@ -760,7 +760,7 @@ function interpret(code, initialVars) {
         let i = startIdx;
         while (i < endIdx) {
             steps++;
-            if (steps > MAX_STEPS) throw new Error(`РџСЂРµРІС‹С€РµРЅ Р»РёРјРёС‚ С€Р°РіРѕРІ (${MAX_STEPS}). Р’РѕР·РјРѕР¶РЅo Р±РµСЃРєРѕРЅРµС‡РЅС‹Р№ С†РёРєР»?`);
+            if (steps > MAX_STEPS) throw new Error(`Превышен лимит шагов (${MAX_STEPS}). Возможнo бесконечный цикл?`);
             
             const line = lines[i];
             const trimmed = line.trim();
@@ -769,7 +769,7 @@ function interpret(code, initialVars) {
             
             const lineIndent = getIndent(line);
             if (lineIndent !== indent) {
-                throw new Error(`РћС€РёР±РєР° РѕС‚СЃС‚СѓРїР° РІ СЃС‚СЂРѕРєРµ ${i+1}. РћР¶РёРґР°Р»РѕСЃСЊ ${indent} РїСЂРѕР±РµР»РѕРІ, РїРѕР»СѓС‡РµРЅРѕ ${lineIndent}.`);
+                throw new Error(`Ошибка отступа в строке ${i+1}. Ожидалось ${indent} пробелов, получено ${lineIndent}.`);
             }
             
             // if / elif / else
@@ -780,7 +780,7 @@ function interpret(code, initialVars) {
                 if (evalExpr(condStr)) {
                     executeBlock(i+1, blockEnd, indent + 4);
                     i = blockEnd;
-                    // РџСЂРѕРїСѓСЃРєР°РµРј РІСЃРµ elif/else
+                    // Пропускаем все elif/else
                     while (i < lines.length) {
                         const t = lines[i].trim();
                         if (t.startsWith('elif ') || t === 'else:') {
@@ -816,12 +816,12 @@ function interpret(code, initialVars) {
             // for var in range(...)
             if (trimmed.startsWith('for ') && trimmed.endsWith(':')) {
                 const match = trimmed.match(/^for\s+([a-zA-Z_][a-zA-Z0-9_]*)\s+in\s+range\(([^)]*)\):\s*$/);
-                if (!match) throw new Error(`РќРµРІРµСЂРЅС‹Р№ СЃРёРЅС‚Р°РєСЃРёСЃ for РІ СЃС‚СЂРѕРєРµ ${i+1}. РћР¶РёРґР°РµС‚СЃСЏ: for <РёРјСЏ> in range(...):`);
+                if (!match) throw new Error(`Неверный синтаксис for в строке ${i+1}. Ожидается: for <имя> in range(...):`);
                 const varName = match[1];
                 const rangeArgsStr = match[2].trim();
                 let rangeArgs = [];
                 if (rangeArgsStr !== '') {
-                    // РџР°СЂСЃРёРј Р°СЂРіСѓРјРµРЅС‚С‹ range, СѓС‡РёС‚С‹РІР°СЏ РІР»РѕР¶РµРЅРЅС‹Рµ СЃРєРѕР±РєРё
+                    // Парсим аргументы range, учитывая вложенные скобки
                     let depth = 0, current = '';
                     for (const ch of rangeArgsStr) {
                         if (ch === '(') depth++;
@@ -838,9 +838,9 @@ function interpret(code, initialVars) {
                 if (rangeArgs.length === 1) end = rangeArgs[0];
                 else if (rangeArgs.length === 2) { start = rangeArgs[0]; end = rangeArgs[1]; }
                 else if (rangeArgs.length === 3) { start = rangeArgs[0]; end = rangeArgs[1]; step = rangeArgs[2]; }
-                else throw new Error(`range() РїСЂРёРЅРёРјР°РµС‚ 1-3 Р°СЂРіСѓРјРµРЅС‚Р°, РїРѕР»СѓС‡РµРЅРѕ ${rangeArgs.length}`);
+                else throw new Error(`range() принимает 1-3 аргумента, получено ${rangeArgs.length}`);
                 
-                if (step === 0) throw new Error("step РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ 0 РІ range()");
+                if (step === 0) throw new Error("step не может быть 0 в range()");
                 
                 const blockEnd = findBlockEnd(lines, i+1, indent);
                 const iterLimit = 10000;
@@ -848,14 +848,14 @@ function interpret(code, initialVars) {
                 if (step > 0) {
                     for (let v = start; v < end; v += step) {
                         iters++;
-                        if (iters > iterLimit) throw new Error(`РЎР»РёС€РєРѕРј РјРЅРѕРіРѕ РёС‚РµСЂР°С†РёР№ for РІ СЃС‚СЂРѕРєРµ ${i+1}`);
+                        if (iters > iterLimit) throw new Error(`Слишком много итераций for в строке ${i+1}`);
                         vars[varName] = v;
                         executeBlock(i+1, blockEnd, indent + 4);
                     }
                 } else {
                     for (let v = start; v > end; v += step) {
                         iters++;
-                        if (iters > iterLimit) throw new Error(`РЎР»РёС€РєРѕРј РјРЅРѕРіРѕ РёС‚РµСЂР°С†РёР№ for РІ СЃС‚СЂРѕРєРµ ${i+1}`);
+                        if (iters > iterLimit) throw new Error(`Слишком много итераций for в строке ${i+1}`);
                         vars[varName] = v;
                         executeBlock(i+1, blockEnd, indent + 4);
                     }
@@ -871,7 +871,7 @@ function interpret(code, initialVars) {
                 let iterations = 0;
                 while (evalExpr(condStr)) {
                     iterations++;
-                    if (iterations > 5000) throw new Error(`РЎР»РёС€РєРѕРј РјРЅРѕРіРѕ РёС‚РµСЂР°С†РёР№ while РІ СЃС‚СЂРѕРєРµ ${i+1} (РІРѕР·РјРѕР¶РЅРѕ Р±РµСЃРєРѕРЅРµС‡РЅС‹Р№ С†РёРєР»)`);
+                    if (iterations > 5000) throw new Error(`Слишком много итераций while в строке ${i+1} (возможно бесконечный цикл)`);
                     executeBlock(i+1, blockEnd, indent + 4);
                 }
                 i = blockEnd;
@@ -884,7 +884,7 @@ function interpret(code, initialVars) {
                 if (argStr === '') {
                     output.push('');
                 } else {
-                    // РџРѕРґРґРµСЂР¶РєР° РЅРµСЃРєРѕР»СЊРєРёС… Р°СЂРіСѓРјРµРЅС‚РѕРІ С‡РµСЂРµР· Р·Р°РїСЏС‚СѓСЋ
+                    // Поддержка нескольких аргументов через запятую
                     let args = [], depth = 0, current = '';
                     for (const ch of argStr) {
                         if (ch === '(') depth++;
@@ -901,8 +901,8 @@ function interpret(code, initialVars) {
                 continue;
             }
             
-            // РџСЂРёСЃРІР°РёРІР°РЅРёРµ
-            // РС‰РµРј РїРµСЂРІРѕРµ '=', РЅРµ РІС…РѕРґСЏС‰РµРµ РІ ==, !=, <=, >=
+            // Присваивание
+            // Ищем первое '=', не входящее в ==, !=, <=, >=
             let eqIdx = -1;
             for (let k = 0; k < trimmed.length; k++) {
                 if (trimmed[k] === '=') {
@@ -918,10 +918,10 @@ function interpret(code, initialVars) {
             if (eqIdx > 0) {
                 const varName = trimmed.slice(0, eqIdx).trim();
                 if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(varName)) {
-                    throw new Error(`РќРµРґРѕРїСѓСЃС‚РёРјРѕРµ РёРјСЏ РїРµСЂРµРјРµРЅРЅРѕР№: '${varName}' (СЃС‚СЂРѕРєР° ${i+1})`);
+                    throw new Error(`Недопустимое имя переменной: '${varName}' (строка ${i+1})`);
                 }
                 const exprStr = trimmed.slice(eqIdx+1).trim();
-                if (!exprStr) throw new Error(`РџСѓСЃС‚РѕРµ РІС‹СЂР°Р¶РµРЅРёРµ РїРѕСЃР»Рµ '=' РІ СЃС‚СЂРѕРєРµ ${i+1}`);
+                if (!exprStr) throw new Error(`Пустое выражение после '=' в строке ${i+1}`);
                 const value = evalExpr(exprStr);
                 vars[varName] = value;
                 if (varName === 'x' || varName === 'y') {
@@ -932,7 +932,7 @@ function interpret(code, initialVars) {
                 continue;
             }
             
-            throw new Error(`РќРµРїРѕРЅСЏС‚РЅР°СЏ СЃС‚СЂРѕРєР° ${i+1}: '${trimmed}'`);
+            throw new Error(`Непонятная строка ${i+1}: '${trimmed}'`);
         }
         return i;
     }
@@ -941,14 +941,14 @@ function interpret(code, initialVars) {
     return { vars, output, moves };
 }
 
-// ==================== Р—РђРџРЈРЎРљ РљРћР”Рђ ====================
+// ==================== ЗАПУСК КОДА ====================
 async function runCode() {
     if (isRunning) return;
     isRunning = true;
     btnRun.disabled = true;
-    btnRun.textContent = 'вЏі Р’С‹РїРѕР»РЅСЏРµС‚СЃСЏ...';
+    btnRun.textContent = '⏳ Выполняется...';
     
-    // РЎР±СЂР°СЃС‹РІР°РµРј СѓСЂРѕРІРµРЅСЊ РґР»СЏ С‡РёСЃС‚РѕРіРѕ Р·Р°РїСѓСЃРєР°
+    // Сбрасываем уровень для чистого запуска
     const level = levels[currentLevel];
     mapData = level.map.map(row => [...row]);
     candiesCollected = 0;
@@ -974,27 +974,27 @@ async function runCode() {
     const initialVars = { x: player.x, y: player.y };
     
     try {
-        log('рџђЌ Р—Р°РїСѓСЃРє РїСЂРѕРіСЂР°РјРјС‹...', 'info');
+        log('🐍 Запуск программы...', 'info');
         const result = interpret(code, initialVars);
         
-        log(`вњ… РџСЂРѕРіСЂР°РјРјР° РІС‹РїРѕР»РЅРµРЅР°. РЁР°РіРѕРІ РґРІРёР¶РµРЅРёСЏ: ${result.moves.length}`, 'success');
+        log(`✅ Программа выполнена. Шагов движения: ${result.moves.length}`, 'success');
         if (result.output.length > 0) {
-            log(`рџ“¤ Р’С‹РІРѕРґ print():`, 'info');
+            log(`📤 Вывод print():`, 'info');
             result.output.forEach(line => log(`   ${line}`, 'output'));
         }
         
         updateVarsPanel(result.vars);
         
-        // РђРЅРёРјР°С†РёСЏ РґРІРёР¶РµРЅРёСЏ
+        // Анимация движения
         await animateMoves(result.moves);
         
     } catch (e) {
-        log(`вќЊ РћС€РёР±РєР°: ${e.message}`, 'error');
+        log(`❌ Ошибка: ${e.message}`, 'error');
     }
     
     isRunning = false;
     btnRun.disabled = false;
-    btnRun.textContent = 'в–¶ Р—Р°РїСѓСЃС‚РёС‚СЊ';
+    btnRun.textContent = '▶ Запустить';
 }
 
 function canMoveTo(x, y) {
@@ -1012,12 +1012,12 @@ async function animateMoves(moves) {
     for (const move of moves) {
         if (!isRunning) break;
         
-        // Р”РІРёРіР°РµРјСЃСЏ РїРѕ X
+        // Двигаемся по X
         while (curX !== move.x) {
             const step = Math.sign(move.x - curX);
             const newX = curX + step;
             if (!canMoveTo(newX, curY)) {
-                log(`рџ§± РќРµР»СЊР·СЏ РґРІРёРіР°С‚СЊСЃСЏ РІ (x=${newX}, y=${curY}) вЂ” СЃС‚РµРЅР° РёР»Рё РіСЂР°РЅРёС†Р°!`, 'error');
+                log(`🧱 Нельзя двигаться в (x=${newX}, y=${curY}) — стена или граница!`, 'error');
                 player.dir = step > 0 ? 1 : 3;
                 render();
                 return;
@@ -1028,12 +1028,12 @@ async function animateMoves(moves) {
             await stepAnimate(speed);
             if (victoryShown) return;
         }
-        // Р”РІРёРіР°РµРјСЃСЏ РїРѕ Y
+        // Двигаемся по Y
         while (curY !== move.y) {
             const step = Math.sign(move.y - curY);
             const newY = curY + step;
             if (!canMoveTo(curX, newY)) {
-                log(`рџ§± РќРµР»СЊР·СЏ РґРІРёРіР°С‚СЊСЃСЏ РІ (x=${curX}, y=${newY}) вЂ” СЃС‚РµРЅР° РёР»Рё РіСЂР°РЅРёС†Р°!`, 'error');
+                log(`🧱 Нельзя двигаться в (x=${curX}, y=${newY}) — стена или граница!`, 'error');
                 player.dir = step > 0 ? 2 : 0;
                 render();
                 return;
@@ -1048,43 +1048,43 @@ async function animateMoves(moves) {
 }
 
 async function stepAnimate(speed) {
-    // РџСЂРѕРІРµСЂРєР° РєРѕРЅС„РµС‚С‹
+    // Проверка конфеты
     if (mapData[player.y][player.x] === 2) {
         mapData[player.y][player.x] = 0;
         candiesCollected++;
-        log(`рџЌ¬ РљРѕРЅС„РµС‚Р° СЃРѕР±СЂР°РЅР°! (${candiesCollected}/${totalCandies})`, 'success');
+        log(`🍬 Конфета собрана! (${candiesCollected}/${totalCandies})`, 'success');
     }
     render();
-    updateVarsPanel({ x: player.x, y: player.y, 'рџЌ¬': `${candiesCollected}/${totalCandies}` });
+    updateVarsPanel({ x: player.x, y: player.y, '🍬': `${candiesCollected}/${totalCandies}` });
     await sleep(speed);
     
-    // РџСЂРѕРІРµСЂРєР° РїРѕР±РµРґС‹
+    // Проверка победы
     if (mapData[player.y][player.x] === 3 && candiesCollected === totalCandies && !victoryShown) {
-        log(`рџЋ‰ РЈСЂРѕРІРµРЅСЊ РїСЂРѕР№РґРµРЅ! Р’СЃРµ РєРѕРЅС„РµС‚С‹ СЃРѕР±СЂР°РЅС‹!`, 'success');
+        log(`🎉 Уровень пройден! Все конфеты собраны!`, 'success');
         setTimeout(() => showVictory(), 400);
     }
 }
 
-// ==================== РџРћР‘Р•Р”Рђ ====================
+// ==================== ПОБЕДА ====================
 function showVictory() {
     victoryShown = true;
     const isLastLevel = currentLevel >= levels.length - 1;
     
     if (isLastLevel) {
-        victoryTitle.textContent = 'рџЏ† Р’РЎР• РЈР РћР’РќР РџР РћР™Р”Р•РќР«! рџЏ†';
-        victoryEmoji.textContent = 'рџЋѓрџ‘»рџЋѓ';
-        victoryMessage.innerHTML = `РџРѕР·РґСЂР°РІР»СЏРµРј! РўС‹ РЅР°СЃС‚РѕСЏС‰РёР№ Python-РјР°СЃС‚РµСЂ РҐСЌР»Р»РѕСѓРёРЅР°!<br>РўС‹РєРІР° РїСЂРѕС€Р»Р° С‡РµСЂРµР· РІСЃРµ РёСЃРїС‹С‚Р°РЅРёСЏ!`;
-        btnVictory.textContent = 'рџ”„ РќР°С‡Р°С‚СЊ СЃРЅР°С‡Р°Р»Р°';
+        victoryTitle.textContent = '🏆 ВСЕ УРОВНИ ПРОЙДЕНЫ! 🏆';
+        victoryEmoji.textContent = '🎃👻🎃';
+        victoryMessage.innerHTML = `Поздравляем! Ты настоящий Python-мастер Хэллоуина!<br>Тыква прошла через все испытания!`;
+        btnVictory.textContent = '🔄 Начать сначала';
         btnVictory.onclick = () => { currentLevel = 0; closeVictory(); };
     } else {
-        victoryTitle.textContent = 'рџЋ‰ РЈР РћР’Р•РќР¬ РџР РћР™Р”Р•Рќ! рџЋ‰';
-        victoryEmoji.textContent = 'рџЋѓрџЌ¬рџЋѓ';
-        victoryMessage.innerHTML = `РћС‚Р»РёС‡РЅРѕ! РўС‹РєРІР° РЅР°РїРёСЃР°Р»Р° РїСЂР°РІРёР»СЊРЅС‹Р№ РєРѕРґ<br>Рё РґРѕР±СЂР°Р»Р°СЃСЊ РґРѕ РІС‹С…РѕРґР°!`;
-        btnVictory.textContent = 'вћЎ РЎР»РµРґСѓСЋС‰РёР№ СѓСЂРѕРІРµРЅСЊ';
+        victoryTitle.textContent = '🎉 УРОВЕНЬ ПРОЙДЕН! 🎉';
+        victoryEmoji.textContent = '🎃🍬🎃';
+        victoryMessage.innerHTML = `Отлично! Тыква написала правильный код<br>и добралась до выхода!`;
+        btnVictory.textContent = '➡ Следующий уровень';
         btnVictory.onclick = () => { currentLevel++; closeVictory(); };
     }
     
-    victoryStats.innerHTML = `РЈСЂРѕРІРµРЅСЊ: ${currentLevel + 1} РёР· ${levels.length}<br>РЎРѕР±СЂР°РЅРѕ РєРѕРЅС„РµС‚: ${candiesCollected} РёР· ${totalCandies} рџЌ¬`;
+    victoryStats.innerHTML = `Уровень: ${currentLevel + 1} из ${levels.length}<br>Собрано конфет: ${candiesCollected} из ${totalCandies} 🍬`;
     victoryOverlay.style.display = 'flex';
     createFallingCandies();
 }
@@ -1096,7 +1096,7 @@ function closeVictory() {
 }
 
 function createFallingCandies() {
-    const emojis = ['рџЌ¬', 'рџЌ­', 'рџ‘»', 'рџ•·пёЏ', 'рџЋѓ', 'рџ¦‡'];
+    const emojis = ['🍬', '🍭', '👻', '🕷️', '🎃', '🦇'];
     for (let i = 0; i < 30; i++) {
         setTimeout(() => {
             const candy = document.createElement('div');
@@ -1110,7 +1110,7 @@ function createFallingCandies() {
     }
 }
 
-// РћР±СЂР°Р±РѕС‚РєР° Tab РІ СЂРµРґР°РєС‚РѕСЂРµ
+// Обработка Tab в редакторе
 codeEl.addEventListener('keydown', function(e) {
     if (e.key === 'Tab') {
         e.preventDefault();
@@ -1121,7 +1121,7 @@ codeEl.addEventListener('keydown', function(e) {
     }
 });
 
-// Р—Р°РїСѓСЃРє РїРѕ Ctrl+Enter
+// Запуск по Ctrl+Enter
 codeEl.addEventListener('keydown', function(e) {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
         e.preventDefault();
@@ -1129,7 +1129,7 @@ codeEl.addEventListener('keydown', function(e) {
     }
 });
 
-// РЎС‚Р°СЂС‚
+// Старт
 initLevel();
 </script>
 </body>
