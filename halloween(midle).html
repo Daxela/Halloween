@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> РҐСЌР»Р»РѕСѓРёРЅ: РџСѓС‚СЊ РўС‹РєРІС‹ рџ‘»</title>
+    <title> Хэллоуин: Путь Тыквы 👻</title>
     <style>
         body {
             background-color: #1a0b2e;
@@ -131,7 +131,7 @@
             50% { opacity: 0.7; }
         }
 
-        /* РњРћР”РђР›Р¬РќРћР• РћРљРќРћ РџРћР—Р”Р РђР’Р›Р•РќРРЇ */
+        /* МОДАЛЬНОЕ ОКНО ПОЗДРАВЛЕНИЯ */
         #victory-overlay {
             position: fixed;
             top: 0;
@@ -269,7 +269,7 @@
             transform: translateY(0);
         }
 
-        /* РџР°РґР°СЋС‰РёРµ РєРѕРЅС„РµС‚С‹ */
+        /* Падающие конфеты */
         .falling-candy {
             position: fixed;
             font-size: 30px;
@@ -289,38 +289,38 @@
 </head>
 <body>
 
-    <h1>рџЋѓ РҐСЌР»Р»РѕСѓРёРЅ: РџСѓС‚СЊ РўС‹РєРІС‹ </h1>
-    <div id="level-info">РЈСЂРѕРІРµРЅСЊ 1: Р—Р°Р±СЂРѕС€РµРЅРЅРѕРµ РєР»Р°РґР±РёС‰Рµ</div>
+    <h1>🎃 Хэллоуин: Путь Тыквы </h1>
+    <div id="level-info">Уровень 1: Заброшенное кладбище</div>
 
     <div id="game-container">
         <div id="grid"></div>
         <div id="controls">
             <div class="new-feature" id="new-feature"></div>
-            <textarea id="commands" placeholder="Р’РІРµРґРёС‚Рµ РєРѕРјР°РЅРґС‹ (РєР°Р¶РґР°СЏ СЃ РЅРѕРІРѕР№ СЃС‚СЂРѕРєРё):&#10;РІРїСЂР°РІРѕ&#10;РІРЅРёР·&#10;РІР»РµРІРѕ&#10;РІРІРµСЂС…"></textarea>
-            <button class="btn-run" onclick="runCommands()">в–¶ Р—Р°РїСѓСЃС‚РёС‚СЊ (РљРѕР»РґРѕРІР°С‚СЊ)</button>
-            <button class="btn-reset" onclick="resetLevel()">рџ”„ РЎР±СЂРѕСЃ СѓСЂРѕРІРЅСЏ</button>
+            <textarea id="commands" placeholder="Введите команды (каждая с новой строки):&#10;вправо&#10;вниз&#10;влево&#10;вверх"></textarea>
+            <button class="btn-run" onclick="runCommands()">▶ Запустить (Колдовать)</button>
+            <button class="btn-reset" onclick="resetLevel()">🔄 Сброс уровня</button>
             <div class="legend" id="legend">
-                рџЋѓ - Р’С‹ (РўС‹РєРІР°) | рџЌ¬ - РљРѕРЅС„РµС‚Р° | рџљЄ - Р’С‹С…РѕРґ | рџЄ¦ - РЎС‚РµРЅР°<br>
-                Р–С‘Р»С‚Р°СЏ СЃС‚СЂРµР»РєР° РїРѕРєР°Р·С‹РІР°РµС‚ РЅР°РїСЂР°РІР»РµРЅРёРµ РґРІРёР¶РµРЅРёСЏ<br>
-                РљРѕРјР°РЅРґС‹: <b>РІРІРµСЂС…, РІРЅРёР·, РІР»РµРІРѕ, РІРїСЂР°РІРѕ</b>
+                🎃 - Вы (Тыква) | 🍬 - Конфета | 🚪 - Выход | 🪦 - Стена<br>
+                Жёлтая стрелка показывает направление движения<br>
+                Команды: <b>вверх, вниз, влево, вправо</b>
             </div>
         </div>
     </div>
 
     <div id="console"></div>
 
-    <!-- РњРѕРґР°Р»СЊРЅРѕРµ РѕРєРЅРѕ РїРѕР·РґСЂР°РІР»РµРЅРёСЏ -->
+    <!-- Модальное окно поздравления -->
     <div id="victory-overlay">
         <div id="victory-modal">
             <div class="victory-content">
-                <div class="victory-title" id="victory-title">рџЋ‰ РЈР РћР’Р•РќР¬ РџР РћР™Р”Р•Рќ! рџЋ‰</div>
-                <div class="victory-emoji" id="victory-emoji">рџЋѓрџЌ¬рџЋѓ</div>
+                <div class="victory-title" id="victory-title">🎉 УРОВЕНЬ ПРОЙДЕН! 🎉</div>
+                <div class="victory-emoji" id="victory-emoji">🎃🍬🎃</div>
                 <div class="victory-message" id="victory-message">
-                    РўС‹РєРІР° СѓСЃРїРµС€РЅРѕ РґРѕР±СЂР°Р»Р°СЃСЊ РґРѕ РІС‹С…РѕРґР°!
+                    Тыква успешно добралась до выхода!
                 </div>
                 <div class="victory-stats" id="victory-stats"></div>
                 <button class="btn-victory" id="btn-victory" onclick="closeVictory()">
-                    вћЎ РЎР»РµРґСѓСЋС‰РёР№ СѓСЂРѕРІРµРЅСЊ
+                    ➡ Следующий уровень
                 </button>
             </div>
         </div>
@@ -329,7 +329,7 @@
     <script>
         const levels = [
             {
-                name: "РЈСЂРѕРІРµРЅСЊ 1: РўС‹РєРІРµРЅРЅС‹Р№ РїРµСЂРµСѓР»РѕРє (4Г—4) вЂ” 1 РєРѕРЅС„РµС‚Р°",
+                name: "Уровень 1: Тыквенный переулок (4×4) — 1 конфета",
                 map: [
                     [4, 0, 0, 0],
                     [1, 1, 0, 1],
@@ -339,7 +339,7 @@
                 startDir: 2
             },
             {
-                name: "РЈСЂРѕРІРµРЅСЊ 2: Р—Р°Р±СЂРѕС€РµРЅРЅРѕРµ РєР»Р°РґР±РёС‰Рµ (5Г—5) вЂ” 2 РєРѕРЅС„РµС‚С‹",
+                name: "Уровень 2: Заброшенное кладбище (5×5) — 2 конфеты",
                 map: [
                     [4, 0, 0, 0, 0],
                     [1, 1, 0, 1, 0],
@@ -350,7 +350,7 @@
                 startDir: 2
             },
             {
-                name: "РЈСЂРѕРІРµРЅСЊ 3: Р”РѕРј СЃ РїСЂРёРІРёРґРµРЅРёСЏРјРё (6Г—6) вЂ” 3 РєРѕРЅС„РµС‚С‹",
+                name: "Уровень 3: Дом с привидениями (6×6) — 3 конфеты",
                 map: [
                     [4, 0, 1, 0, 0, 0],
                     [0, 0, 1, 0, 1, 0],
@@ -362,7 +362,7 @@
                 startDir: 2
             },
             {
-                name: "РЈСЂРѕРІРµРЅСЊ 4: Р›РµСЃРЅР°СЏ С‚СЂРѕРїР° (7Г—5) вЂ” 3 РєРѕРЅС„РµС‚С‹",
+                name: "Уровень 4: Лесная тропа (7×5) — 3 конфеты",
                 map: [
                     [4, 0, 0, 0, 0, 0, 0],
                     [0, 1, 0, 1, 1, 0, 1],
@@ -373,7 +373,7 @@
                 startDir: 2
             },
             {
-                name: "РЈСЂРѕРІРµРЅСЊ 5: Р—Р°РјРѕРє Р”СЂР°РєСѓР»С‹ (8Г—8) вЂ” 5 РєРѕРЅС„РµС‚",
+                name: "Уровень 5: Замок Дракулы (8×8) — 5 конфет",
                 map: [
                     [4, 0, 1, 0, 0, 0, 1, 0],
                     [0, 0, 1, 0, 1, 0, 1, 0],
@@ -387,7 +387,7 @@
                 startDir: 2
             },
             {
-                name: "РЈСЂРѕРІРµРЅСЊ 6: РџРѕРґР·РµРјРµР»СЊРµ РІР°РјРїРёСЂРѕРІ (9Г—9) вЂ” 4 РєРѕРЅС„РµС‚С‹",
+                name: "Уровень 6: Подземелье вампиров (9×9) — 4 конфеты",
                 map: [
                     [4, 0, 0, 0, 1, 0, 0, 0, 0],
                     [1, 1, 0, 0, 1, 0, 1, 1, 0],
@@ -402,7 +402,7 @@
                 startDir: 2
             },
             {
-                name: "РЈСЂРѕРІРµРЅСЊ 7: Р›РѕРіРѕРІРѕ Р¤СЂР°РЅРєРµРЅС€С‚РµР№РЅР° (10Г—10) вЂ” 6 РєРѕРЅС„РµС‚",
+                name: "Уровень 7: Логово Франкенштейна (10×10) — 6 конфет",
                 map: [
                     [4, 0, 0, 1, 0, 0, 0, 1, 0, 0],
                     [0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
@@ -440,7 +440,7 @@
         const victoryStats = document.getElementById('victory-stats');
         const btnVictory = document.getElementById('btn-victory');
 
-        const arrows = ['в–І', 'в–¶', 'в–ј', 'в—Ђ'];
+        const arrows = ['▲', '▶', '▼', '◀'];
 
         function log(msg, type = 'info') {
             const p = document.createElement('div');
@@ -455,25 +455,25 @@
             const isLastLevel = currentLevel >= levels.length - 1;
             
             if (isLastLevel) {
-                victoryTitle.textContent = 'рџЏ† Р’Р« РџР РћРЁР›Р Р’РЎР• РЈР РћР’РќР! рџЏ†';
-                victoryEmoji.textContent = 'рџЋѓрџ‘»рџЋѓ';
+                victoryTitle.textContent = '🏆 ВЫ ПРОШЛИ ВСЕ УРОВНИ! 🏆';
+                victoryEmoji.textContent = '🎃👻🎃';
                 victoryMessage.innerHTML = `
-                    РџРѕР·РґСЂР°РІР»СЏРµРј! Р’С‹ РЅР°СЃС‚РѕСЏС‰РёР№ РјР°СЃС‚РµСЂ РҐСЌР»Р»РѕСѓРёРЅР°!<br>
-                    РўС‹РєРІР° РїСЂРѕС€Р»Р° С‡РµСЂРµР· РІСЃРµ РёСЃРїС‹С‚Р°РЅРёСЏ Рё РЅР°С€Р»Р° РІС‹С…РѕРґ РёР· Р»РѕРіРѕРІР° Р¤СЂР°РЅРєРµРЅС€С‚РµР№РЅР°!
+                    Поздравляем! Вы настоящий мастер Хэллоуина!<br>
+                    Тыква прошла через все испытания и нашла выход из логова Франкенштейна!
                 `;
-                btnVictory.textContent = 'рџ”„ РќР°С‡Р°С‚СЊ СЃРЅР°С‡Р°Р»Р°';
+                btnVictory.textContent = '🔄 Начать сначала';
                 btnVictory.onclick = () => {
                     currentLevel = 0;
                     closeVictory();
                 };
             } else {
-                victoryTitle.textContent = 'рџЋ‰ РЈР РћР’Р•РќР¬ РџР РћР™Р”Р•Рќ! рџЋ‰';
-                victoryEmoji.textContent = 'рџЋѓрџЌ¬рџЋѓ';
+                victoryTitle.textContent = '🎉 УРОВЕНЬ ПРОЙДЕН! 🎉';
+                victoryEmoji.textContent = '🎃🍬🎃';
                 victoryMessage.innerHTML = `
-                    РћС‚Р»РёС‡РЅРѕ! РўС‹РєРІР° СЃРѕР±СЂР°Р»Р° РІСЃРµ РєРѕРЅС„РµС‚С‹<br>
-                    Рё РґРѕР±СЂР°Р»Р°СЃСЊ РґРѕ РІС‹С…РѕРґР°!
+                    Отлично! Тыква собрала все конфеты<br>
+                    и добралась до выхода!
                 `;
-                btnVictory.textContent = 'вћЎ РЎР»РµРґСѓСЋС‰РёР№ СѓСЂРѕРІРµРЅСЊ';
+                btnVictory.textContent = '➡ Следующий уровень';
                 btnVictory.onclick = () => {
                     currentLevel++;
                     closeVictory();
@@ -481,8 +481,8 @@
             }
             
             victoryStats.innerHTML = `
-                РЈСЂРѕРІРµРЅСЊ: ${currentLevel + 1} РёР· ${levels.length}<br>
-                РЎРѕР±СЂР°РЅРѕ РєРѕРЅС„РµС‚: ${candiesCollected} РёР· ${totalCandies} рџЌ¬
+                Уровень: ${currentLevel + 1} из ${levels.length}<br>
+                Собрано конфет: ${candiesCollected} из ${totalCandies} 🍬
             `;
             
             victoryOverlay.style.display = 'flex';
@@ -496,7 +496,7 @@
         }
 
         function createFallingCandies() {
-            const emojis = ['рџЌ¬', '', 'рџ‘»', '', 'рџ•·пёЏ', 'рџЌ­'];
+            const emojis = ['🍬', '', '👻', '', '🕷️', '🍭'];
             for (let i = 0; i < 30; i++) {
                 setTimeout(() => {
                     const candy = document.createElement('div');
@@ -523,23 +523,23 @@
             
             if (currentLevel >= 5) {
                 newFeatureEl.style.display = 'block';
-                newFeatureEl.textContent = 'вњЁ РќРѕРІР°СЏ РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ: РїРёС€РёС‚Рµ "РІРїСЂР°РІРѕ *" РґР»СЏ РґРІРёР¶РµРЅРёСЏ РґРѕ СЃС‚РµРЅС‹!';
-                commandsEl.placeholder = "РџСЂРёРјРµСЂС‹ РєРѕРјР°РЅРґ:\nРІРїСЂР°РІРѕ *\nРІРЅРёР· 3\nРІР»РµРІРѕ\nРІРІРµСЂС… *";
-                legendEl.innerHTML = "рџЋѓ - Р’С‹ (РўС‹РєРІР°) | рџЌ¬ - РљРѕРЅС„РµС‚Р° | рџљЄ - Р’С‹С…РѕРґ | рџЄ¦ - РЎС‚РµРЅР°<br>Р–С‘Р»С‚Р°СЏ СЃС‚СЂРµР»РєР° РїРѕРєР°Р·С‹РІР°РµС‚ РЅР°РїСЂР°РІР»РµРЅРёРµ РґРІРёР¶РµРЅРёСЏ<br>РљРѕРјР°РЅРґС‹: <b>РІРІРµСЂС…, РІРЅРёР·, РІР»РµРІРѕ, РІРїСЂР°РІРѕ</b><br><b style='color:#00bcd4'>РќРѕРІРёРЅРєР°: '*' РѕР·РЅР°С‡Р°РµС‚ 'РґРѕ СЃС‚РµРЅС‹'!</b>";
-                log(`вњЁ РќРѕРІС‹Р№ СѓСЂРѕРІРµРЅСЊ! РўРµРїРµСЂСЊ РјРѕР¶РЅРѕ РїРёСЃР°С‚СЊ "РєРѕРјР°РЅРґР° *" РґР»СЏ РґРІРёР¶РµРЅРёСЏ РґРѕ СЃС‚РµРЅС‹!`, 'hint');
+                newFeatureEl.textContent = '✨ Новая возможность: пишите "вправо *" для движения до стены!';
+                commandsEl.placeholder = "Примеры команд:\nвправо *\nвниз 3\nвлево\nвверх *";
+                legendEl.innerHTML = "🎃 - Вы (Тыква) | 🍬 - Конфета | 🚪 - Выход | 🪦 - Стена<br>Жёлтая стрелка показывает направление движения<br>Команды: <b>вверх, вниз, влево, вправо</b><br><b style='color:#00bcd4'>Новинка: '*' означает 'до стены'!</b>";
+                log(`✨ Новый уровень! Теперь можно писать "команда *" для движения до стены!`, 'hint');
             } else if (currentLevel >= 3) {
                 newFeatureEl.style.display = 'block';
-                newFeatureEl.textContent = 'вњЁ РќРѕРІР°СЏ РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ: РїРёС€РёС‚Рµ "РІРїСЂР°РІРѕ 3" РґР»СЏ РїРѕРІС‚РѕСЂРµРЅРёСЏ!';
-                commandsEl.placeholder = "РџСЂРёРјРµСЂС‹ РєРѕРјР°РЅРґ:\nРІРїСЂР°РІРѕ 3\nРІРЅРёР· 2\nРІР»РµРІРѕ\nРІРІРµСЂС… 4";
-                legendEl.innerHTML = " - Р’С‹ (РўС‹РєРІР°) |  - РљРѕРЅС„РµС‚Р° | рџљЄ - Р’С‹С…РѕРґ | рџЄ¦ - РЎС‚РµРЅР°<br>Р–С‘Р»С‚Р°СЏ СЃС‚СЂРµР»РєР° РїРѕРєР°Р·С‹РІР°РµС‚ РЅР°РїСЂР°РІР»РµРЅРёРµ РґРІРёР¶РµРЅРёСЏ<br>РљРѕРјР°РЅРґС‹: <b>РІРІРµСЂС…, РІРЅРёР·, РІР»РµРІРѕ, РІРїСЂР°РІРѕ</b><br><b style='color:#00bcd4'>РќРѕРІРёРЅРєР°: РјРѕР¶РЅРѕ РїРёСЃР°С‚СЊ 'РІРїСЂР°РІРѕ 3' РґР»СЏ РїРѕРІС‚РѕСЂРµРЅРёСЏ!</b>";
-                log(`вњЁ РќРѕРІС‹Р№ СѓСЂРѕРІРµРЅСЊ! РўРµРїРµСЂСЊ РјРѕР¶РЅРѕ РїРёСЃР°С‚СЊ "РєРѕРјР°РЅРґР° С‡РёСЃР»Рѕ" РґР»СЏ РїРѕРІС‚РѕСЂРµРЅРёСЏ!`, 'hint');
+                newFeatureEl.textContent = '✨ Новая возможность: пишите "вправо 3" для повторения!';
+                commandsEl.placeholder = "Примеры команд:\nвправо 3\nвниз 2\nвлево\nвверх 4";
+                legendEl.innerHTML = " - Вы (Тыква) |  - Конфета | 🚪 - Выход | 🪦 - Стена<br>Жёлтая стрелка показывает направление движения<br>Команды: <b>вверх, вниз, влево, вправо</b><br><b style='color:#00bcd4'>Новинка: можно писать 'вправо 3' для повторения!</b>";
+                log(`✨ Новый уровень! Теперь можно писать "команда число" для повторения!`, 'hint');
             } else {
                 newFeatureEl.style.display = 'none';
-                commandsEl.placeholder = "Р’РІРµРґРёС‚Рµ РєРѕРјР°РЅРґС‹ (РєР°Р¶РґР°СЏ СЃ РЅРѕРІРѕР№ СЃС‚СЂРѕРєРё):\nРІРїСЂР°РІРѕ\nРІРЅРёР·\nРІР»РµРІРѕ\nРІРІРµСЂС…";
-                legendEl.innerHTML = "рџЋѓ - Р’С‹ (РўС‹РєРІР°) | рџЌ¬ - РљРѕРЅС„РµС‚Р° | рџљЄ - Р’С‹С…РѕРґ | рџЄ¦ - РЎС‚РµРЅР°<br>Р–С‘Р»С‚Р°СЏ СЃС‚СЂРµР»РєР° РїРѕРєР°Р·С‹РІР°РµС‚ РЅР°РїСЂР°РІР»РµРЅРёРµ РґРІРёР¶РµРЅРёСЏ<br>РљРѕРјР°РЅРґС‹: <b>РІРІРµСЂС…, РІРЅРёР·, РІР»РµРІРѕ, РІРїСЂР°РІРѕ</b>";
+                commandsEl.placeholder = "Введите команды (каждая с новой строки):\nвправо\nвниз\nвлево\nвверх";
+                legendEl.innerHTML = "🎃 - Вы (Тыква) | 🍬 - Конфета | 🚪 - Выход | 🪦 - Стена<br>Жёлтая стрелка показывает направление движения<br>Команды: <b>вверх, вниз, влево, вправо</b>";
             }
             
-            log(`РќР°С‡Р°Р»Рѕ СѓСЂРѕРІРЅСЏ. РќР°Р№РґРёС‚Рµ РІСЃРµ рџЌ¬ Рё РґРѕР±РµСЂРёС‚РµСЃСЊ РґРѕ рџљЄ!`, 'info');
+            log(`Начало уровня. Найдите все 🍬 и доберитесь до 🚪!`, 'info');
 
             for (let y = 0; y < mapData.length; y++) {
                 for (let x = 0; x < mapData[y].length; x++) {
@@ -567,15 +567,15 @@
                     const val = mapData[y][x];
                     if (val === 1) {
                         cell.classList.add('wall');
-                        cell.textContent = 'рџЄ¦';
+                        cell.textContent = '🪦';
                     } else if (val === 2) {
-                        cell.textContent = 'рџЌ¬';
+                        cell.textContent = '🍬';
                     } else if (val === 3) {
-                        cell.textContent = 'рџљЄ';
+                        cell.textContent = '🚪';
                     }
 
                     if (x === player.x && y === player.y) {
-                        cell.textContent = 'рџЋѓ';
+                        cell.textContent = '🎃';
                         cell.classList.add('player');
                         
                         const indicator = document.createElement('div');
@@ -601,27 +601,27 @@
         function moveOneStep(cmd) {
             let dx = 0, dy = 0;
             
-            if (cmd === 'РІРІРµСЂС…') {
+            if (cmd === 'вверх') {
                 player.dir = 0;
                 dy = -1;
-            } else if (cmd === 'РІРЅРёР·') {
+            } else if (cmd === 'вниз') {
                 player.dir = 2;
                 dy = 1;
-            } else if (cmd === 'РІР»РµРІРѕ') {
+            } else if (cmd === 'влево') {
                 player.dir = 3;
                 dx = -1;
-            } else if (cmd === 'РІРїСЂР°РІРѕ') {
+            } else if (cmd === 'вправо') {
                 player.dir = 1;
                 dx = 1;
             } else {
-                return { success: false, error: `РќРµРёР·РІРµСЃС‚РЅР°СЏ РєРѕРјР°РЅРґР°: "${cmd}"` };
+                return { success: false, error: `Неизвестная команда: "${cmd}"` };
             }
 
             const newX = player.x + dx;
             const newY = player.y + dy;
 
             if (!canMove(newX, newY)) {
-                return { success: false, error: `РќРµР»СЊР·СЏ РґРІРёРіР°С‚СЊСЃСЏ ${cmd} вЂ” СЃС‚РµРЅР° РёР»Рё РіСЂР°РЅРёС†Р°! рџ§±` };
+                return { success: false, error: `Нельзя двигаться ${cmd} — стена или граница! 🧱` };
             }
 
             player.x = newX;
@@ -630,7 +630,7 @@
             if (mapData[newY][newX] === 2) {
                 mapData[newY][newX] = 0;
                 candiesCollected++;
-                log(`РЎРѕР±СЂР°РЅР° РєРѕРЅС„РµС‚Р°! рџЌ¬ (${candiesCollected}/${totalCandies})`, 'success');
+                log(`Собрана конфета! 🍬 (${candiesCollected}/${totalCandies})`, 'success');
             }
 
             return { success: true };
@@ -638,7 +638,7 @@
 
         function checkVictory() {
             if (mapData[player.y][player.x] === 3 && candiesCollected === totalCandies && !victoryShown) {
-                log(`рџЋ‰ РЈСЂРѕРІРµРЅСЊ РїСЂРѕР№РґРµРЅ! Р’СЃРµ РєРѕРЅС„РµС‚С‹ СЃРѕР±СЂР°РЅС‹!`, 'success');
+                log(`🎉 Уровень пройден! Все конфеты собраны!`, 'success');
                 setTimeout(() => showVictory(), 500);
                 return true;
             }
@@ -661,14 +661,14 @@
                 const cmd = parts[0];
                 const modifier = parts.length > 1 ? parts[1] : null;
                 
-                if (!['РІРІРµСЂС…', 'РІРЅРёР·', 'РІР»РµРІРѕ', 'РІРїСЂР°РІРѕ'].includes(cmd)) {
-                    log(`РќРµРёР·РІРµСЃС‚РЅР°СЏ РєРѕРјР°РЅРґР°: "${cmd}"`, 'error');
+                if (!['вверх', 'вниз', 'влево', 'вправо'].includes(cmd)) {
+                    log(`Неизвестная команда: "${cmd}"`, 'error');
                     isRunning = false;
                     return;
                 }
                 
                 if (modifier === '*') {
-                    log(`Р”РІРёР¶РµРЅРёРµ "${cmd}" РґРѕ СЃС‚РµРЅС‹...`, 'info');
+                    log(`Движение "${cmd}" до стены...`, 'info');
                     let steps = 0;
                     while (true) {
                         if (!isRunning) break;
@@ -686,16 +686,16 @@
                             return;
                         }
                     }
-                    log(`РћСЃС‚Р°РЅРѕРІРёР»РёСЃСЊ РїРѕСЃР»Рµ ${steps} С€Р°РіРѕРІ`, 'info');
+                    log(`Остановились после ${steps} шагов`, 'info');
                 } else if (modifier !== null) {
                     const count = parseInt(modifier);
                     if (isNaN(count) || count < 1 || count > 20) {
-                        log(`РќРµРІРµСЂРЅРѕРµ С‡РёСЃР»Рѕ РїРѕРІС‚РѕСЂРµРЅРёР№: "${modifier}" (РґРѕРїСѓСЃС‚РёРјРѕ 1-20 РёР»Рё *)`, 'error');
+                        log(`Неверное число повторений: "${modifier}" (допустимо 1-20 или *)`, 'error');
                         isRunning = false;
                         return;
                     }
                     
-                    log(`Р”РІРёР¶РµРЅРёРµ "${cmd}" Г— ${count}...`, 'info');
+                    log(`Движение "${cmd}" × ${count}...`, 'info');
                     for (let i = 0; i < count; i++) {
                         if (!isRunning) break;
                         const result = moveOneStep(cmd);
