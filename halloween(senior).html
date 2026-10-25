@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>рџЋѓ РҐСЌР»Р»РѕСѓРёРЅ: РџСѓС‚СЊ РўС‹РєРІС‹ вЂ” Python Edition рџђЌ</title>
+<style>
+    * { box-sizing: border-box; }
+    body {
+        background-color: #1a0b2e;
+        color: #ff9800;
+        font-family: 'Courier New', monospace;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+        background-image: radial-gradient(circle at top, #2d1b4e 0%, #1a0b2e 100%);
+    }
+    h1 { text-shadow: 0 0 10px #ff5722; margin-bottom: 5px; text-align: center; }
+    .subtitle { color: #ba68c8; margin-bottom: 15px; font-size: 14px; }
+    #level-info { font-size: 1.2em; color: #ba68c8; margin-bottom: 15px; text-align: center; }
+    
+    #game-container {
+        display: flex;
+        gap: 30px;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: flex-start;
+    }
+
+    #grid {
+        display: grid;
+        gap: 2px;
+        background-color: #4a148c;
+        padding: 5px;
+        border-radius: 10px;
+        box-shadow: 0 0 20px #9c27b0;
+    }
+    .cell {
+        width: 55px;
+        height: 55px;
+        background-color: #2a0a4a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+        position: relative;
+    }
+    .wall { background-color: #111; box-shadow: inset 0 0 10px #000; }
+    .player { transition: all 0.2s ease; }
+    
+    .dir-indicator {
+        position: absolute;
+        font-size: 12px;
+        color: #ffeb3b;
+        opacity: 0.9;
+        text-shadow: 0 0 4px #ffeb3b;
+        pointer-events: none;
+    }
+    .dir-up    { top: 2px; left: 50%; transform: translateX(-50%); }
+    .dir-right { right: 2px; top: 50%; transform: translateY(-50%); }
+    .dir-down  { bottom: 2px; left: 50%; transform: translateX(-50%); }
+    .dir-left  { left: 2px; top: 50%; transform: translateY(-50%); }
+
+    #controls {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        min-width: 380px;
+        max-width: 450px;
+    }
+
+    #vars-panel {
+        background-color: #0d0514;
+        border: 2px solid #4a148c;
+        border-radius: 5px;
+        padding: 8px 12px;
+        font-size: 14px;
+        color: #00ff00;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .var-item { color: #ffeb3b; }
+    .var-name { color: #00bcd4; }
+    .var-value { color: #00ff00; }
+
+    #code-editor {
+        position: relative;
+    }
+    #code {
+        width: 100%;
+        height: 260px;
+        background-color: #0d0514;
+        color: #00ff00;
+        border: 2px solid #4a148c;
+        border-radius: 5px;
+        padding: 10px;
+        font-family: 'Courier New', monospace;
+        font-size: 15px;
+        resize: vertical;
+        line-height: 1.5;
+        tab-size: 4;
+    }
+    #code:focus { outline: none; border-color: #ff9800; }
+
+    .buttons {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    button {
+        padding: 10px 14px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        border: none;
+        border-radius: 5px;
+        transition: 0.2s;
+        font-family: 'Courier New', monospace;
+        flex: 1;
+        min-width: 100px;
+    }
+    .btn-run { background-color: #ff9800; color: #000; }
+    .btn-run:hover:not(:disabled) { background-color: #ffb74d; }
+    .btn-run:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-reset { background-color: #9c27b0; color: #fff; }
+    .btn-reset:hover { background-color: #ba68c8; }
+    .btn-hint { background-color: #00bcd4; color: #000; }
+    .btn-hint:hover { background-color: #4dd0e1; }
+    .btn-clear { background-color: #555; color: #fff; }
+    .btn-clear:hover { background-color: #777; }
+
+    #console {
+        margin-top: 20px;
+        width: 100%;
+        max-width: 900px;
+        height: 140px;
+        background-color: #000;
+        border: 2px solid #ff5722;
+        border-radius: 5px;
+        padding: 10px;
+        overflow-y: auto;
+        font-size: 13px;
+        color: #ccc;
+    }
+    .log-success { color: #4caf50; }
+    .log-error { color: #f44336; }
+    .log-info { color: #ff9800; }
+    .log-hint { color: #00bcd4; }
+    .log-output { color: #fff; }
+    
+    .legend {
+        font-size: 13px;
+        color: #aaa;
+        margin-top: 10px;
+        text-align: center;
+        line-height: 1.6;
+        background: rgba(0,0,0,0.3);
+        padding: 8px;
+        border-radius: 5px;
+    }
+    .legend b { color: #ff9800; }
+    .legend code {
+        background: #0d0514;
+        color: #00ff00;
+        padding: 1px 5px;
+        border-radius: 3px;
+        font-size: 12px;
+    }
+
+    /* РњРћР”РђР›Р¬РќРћР• РћРљРќРћ */
+    #victory-overlay {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.85);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        backdrop-filter: blur(5px);
+    }
+    #victory-modal {
+        background: linear-gradient(135deg, #2d1b4e 0%, #4a148c 50%, #2d1b4e 100%);
+        border: 4px solid #ff9800;
+        border-radius: 20px;
+        padding: 40px 60px;
+        text-align: center;
+        box-shadow: 0 0 40px #ff9800, 0 0 80px #ff5722;
+        animation: modalAppear 0.6s ease-out;
+        max-width: 500px;
+        position: relative;
+        overflow: hidden;
+    }
+    @keyframes modalAppear {
+        0% { transform: scale(0.3) rotate(-10deg); opacity: 0; }
+        50% { transform: scale(1.1) rotate(3deg); }
+        100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+    .victory-title {
+        font-size: 42px;
+        margin: 0 0 20px 0;
+        color: #ff9800;
+        text-shadow: 0 0 10px #ff5722, 0 0 20px #ff5722;
+        animation: titleBounce 1s ease-in-out infinite;
+    }
+    @keyframes titleBounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+    .victory-emoji { font-size: 60px; margin: 15px 0; }
+    .victory-message { font-size: 18px; color: #fff; margin: 15px 0; line-height: 1.5; }
+    .victory-stats {
+        font-size: 14px;
+        color: #ba68c8;
+        margin: 15px 0;
+        padding: 10px;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 10px;
+    }
+    .btn-victory {
+        background: linear-gradient(45deg, #ff9800, #ff5722);
+        color: #000;
+        font-size: 18px;
+        padding: 14px 36px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: bold;
+        margin-top: 15px;
+        box-shadow: 0 5px 15px rgba(255, 152, 0, 0.5);
+    }
+    .btn-victory:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(255, 152, 0, 0.7); }
+
+    .falling-candy {
+        position: fixed;
+        font-size: 28px;
+        top: -50px;
+        animation: fall linear forwards;
+        pointer-events: none;
+        z-index: 999;
+    }
+    @keyframes fall {
+        to { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+    }
+
+    .speed-control {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: #ba68c8;
+    }
+    .speed-control input { flex: 1; }
+</style>
+</head>
+<body>
+
+<h1>рџЋѓ РҐСЌР»Р»РѕСѓРёРЅ: РџСѓС‚СЊ РўС‹РєРІС‹ рџђЌ</h1>
+<div class="subtitle">Python Edition вЂ” СѓРїСЂР°РІР»СЏР№ С‚С‹РєРІРѕР№ СЃ РїРѕРјРѕС‰СЊСЋ РєРѕРґР°!</div>
+<div id="level-info">РЈСЂРѕРІРµРЅСЊ 1</div>
+
+<div id="game-container">
+    <div id="grid"></div>
+    <div id="controls">
+        <div id="vars-panel"></div>
+        
+        <div id="code-editor">
+            <textarea id="code" spellcheck="false" placeholder="# РќР°РїРёС€Рё СЃРІРѕР№ РєРѕРґ РЅР° Python!"></textarea>
+        </div>
+        
+        <div class="buttons">
+            <button class="btn-run" id="btn-run" onclick="runCode()">в–¶ Р—Р°РїСѓСЃС‚РёС‚СЊ</button>
+            <button class="btn-reset" onclick="resetLevel()">рџ”„ РЎР±СЂРѕСЃ</button>
+            <button class="btn-clear" onclick="clearCode()">рџ—‘ РћС‡РёСЃС‚РёС‚СЊ</button>
+        </div>
+        
+        <div class="speed-control">
+            <span>рџђў РЎРєРѕСЂРѕСЃС‚СЊ:</span>
+            <input type="range" id="speed" min="50" max="600" value="250" step="50">
+            <span>рџђ‡</span>
+        </div>
+        
+        <div class="legend">
+            рџЋѓ вЂ” РўС‹РєРІР° (С‚С‹) &nbsp;|&nbsp; рџЌ¬ вЂ” РљРѕРЅС„РµС‚Р° &nbsp;|&nbsp; рџљЄ вЂ” Р’С‹С…РѕРґ &nbsp;|&nbsp; рџЄ¦ вЂ” РЎС‚РµРЅР°<br>
+            РЈРїСЂР°РІР»СЏР№ РїРѕР·РёС†РёРµР№ С‡РµСЂРµР· РїРµСЂРµРјРµРЅРЅС‹Рµ <code>x</code> Рё <code>y</code><br>
+            РџРѕРґРґРµСЂР¶РёРІР°РµС‚СЃСЏ: <code>if</code>, <code>for</code>, <code>while</code>, <code>print()</code>, Р°СЂРёС„РјРµС‚РёРєР°
+        </div>
+    </div>
+</div>
+
+<div id="console"></div>
+
+<div id="victory-overlay">
+    <div id="victory-modal">
+        <div class="victory-title" id="victory-title">рџЋ‰ РЈР РћР’Р•РќР¬ РџР РћР™Р”Р•Рќ! рџЋ‰</div>
+        <div class="victory-emoji" id="victory-emoji">рџЋѓрџЌ¬рџЋѓ</div>
+        <div class="victory-message" id="victory-message"></div>
+        <div class="victory-stats" id="victory-stats"></div>
+        <button class="btn-victory" id="btn-victory">вћЎ РЎР»РµРґСѓСЋС‰РёР№ СѓСЂРѕРІРµРЅСЊ</button>
+    </div>
+</div>
+
+<script>
+// ==================== РЈР РћР’РќР ====================
+const levels = [
+    {
+        name: "РЈСЂРѕРІРµРЅСЊ 1: РўС‹РєРІРµРЅРЅС‹Р№ РїРµСЂРµСѓР»РѕРє (4Г—4)",
+        task: "Р”РѕР№РґРё РґРѕ РІС‹С…РѕРґР°, СЃРѕР±РёСЂР°СЏ РєРѕРЅС„РµС‚С‹",
+        map: [
+            [4, 0, 0, 0],
+            [1, 1, 0, 1],
+            [0, 2, 0, 0],
+            [0, 1, 0, 3]
+        ],
+        startDir: 2,
+        hint: `# РџСЂРѕСЃС‚РѕР№ РїСѓС‚СЊ: РІРїСЂР°РІРѕ, РІРЅРёР·, РІР»РµРІРѕ, РІРІРµСЂС…
+x = x + 1
+y = y + 1
+x = x - 1
+y = y - 1`
+    },
+    {
+        name: "РЈСЂРѕРІРµРЅСЊ 2: Р—Р°Р±СЂРѕС€РµРЅРЅРѕРµ РєР»Р°РґР±РёС‰Рµ (5Г—5)",
+        task: "РЎРѕР±РµСЂРё 2 РєРѕРЅС„РµС‚С‹ Рё РЅР°Р№РґРё РІС‹С…РѕРґ",
+        map: [
+            [4, 0, 0, 0, 0],
+            [1, 1, 0, 1, 0],
+            [0, 0, 0, 1, 2],
+            [0, 1, 2, 0, 0],
+            [0, 0, 0, 0, 3]
+        ],
+        startDir: 2,
+        hint: ``
+    },
+    {
+        name: "РЈСЂРѕРІРµРЅСЊ 3: Р”РѕРј СЃ РїСЂРёРІРёРґРµРЅРёСЏРјРё (6Г—6)",
+        task: "3 РєРѕРЅС„РµС‚С‹! РСЃРїРѕР»СЊР·СѓР№ СѓСЃР»РѕРІРёСЏ",
+        map: [
+            [4, 0, 1, 0, 0, 0],
+            [0, 0, 1, 0, 1, 0],
+            [0, 2, 0, 0, 1, 0],
+            [1, 1, 1, 0, 0, 2],
+            [0, 0, 0, 0, 1, 0],
+            [0, 1, 2, 0, 0, 3]
+        ],
+        startDir: 2,
+        hint: `# РСЃРїРѕР»СЊР·СѓР№ С†РёРєР» for
+for i in range(3):
+    y = y + 1`
+    },
+    {
+        name: "РЈСЂРѕРІРµРЅСЊ 4: Р›РµСЃРЅР°СЏ С‚СЂРѕРїР° (7Г—5)",
+        task: "3 РєРѕРЅС„РµС‚С‹ вЂ” РЅСѓР¶РµРЅ while!",
+        map: [
+            [4, 0, 0, 0, 0, 0, 0],
+            [0, 1, 0, 1, 1, 0, 1],
+            [2, 0, 0, 0, 0, 0, 2],
+            [1, 1, 1, 1, 0, 1, 0],
+            [0, 0, 2, 0, 0, 0, 3]
+        ],
+        startDir: 2,
+        hint: ``
+    },
+    {
+        name: "РЈСЂРѕРІРµРЅСЊ 5: Р—Р°РјРѕРє Р”СЂР°РєСѓР»С‹ (8Г—8)",
+        task: "5 РєРѕРЅС„РµС‚! РџРёС€Рё С„СѓРЅРєС†РёРё...",
+        map: [
+            [4, 0, 1, 0, 0, 0, 1, 0],
+            [0, 0, 1, 0, 1, 0, 1, 0],
+            [0, 2, 0, 0, 1, 0, 0, 2],
+            [1, 1, 1, 0, 1, 1, 1, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 1, 1, 1, 1, 0, 1, 2],
+            [2, 0, 0, 0, 0, 0, 1, 0],
+            [1, 0, 1, 0, 1, 0, 0, 3]
+        ],
+        startDir: 2,
+        hint: `# while РїРѕРјРѕР¶РµС‚ РґРІРёРіР°С‚СЊСЃСЏ РґРѕ РіСЂР°РЅРёС†С‹
+while x < 5:
+    x = x + 1`
+    },
+    {
+        name: "РЈСЂРѕРІРµРЅСЊ 6: РџРѕРґР·РµРјРµР»СЊРµ РІР°РјРїРёСЂРѕРІ (9Г—9)",
+        task: "4 РєРѕРЅС„РµС‚С‹ вЂ” РёСЃРїРѕР»СЊР·СѓР№ РІР»РѕР¶РµРЅРЅС‹Рµ С†РёРєР»С‹",
+        map: [
+            [4, 0, 0, 0, 1, 0, 0, 0, 0],
+            [1, 1, 0, 0, 1, 0, 1, 1, 0],
+            [0, 0, 0, 0, 0, 0, 0, 1, 0],
+            [0, 1, 1, 1, 0, 1, 0, 0, 2],
+            [0, 0, 0, 1, 0, 1, 0, 1, 0],
+            [2, 1, 0, 0, 0, 0, 0, 1, 0],
+            [0, 1, 0, 1, 1, 1, 0, 0, 0],
+            [0, 0, 0, 0, 0, 1, 2, 1, 0],
+            [1, 0, 1, 0, 0, 0, 0, 0, 3]
+        ],
+        startDir: 2,
+        hint: ``
+    },
+    {
+        name: "РЈСЂРѕРІРµРЅСЊ 7: Р›РѕРіРѕРІРѕ Р¤СЂР°РЅРєРµРЅС€С‚РµР№РЅР° (10Г—10)",
+        task: "6 РєРѕРЅС„РµС‚! Р¤РёРЅР°Р»СЊРЅРѕРµ РёСЃРїС‹С‚Р°РЅРёРµ",
+        map: [
+            [4, 0, 0, 1, 0, 0, 0, 1, 0, 0],
+            [0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+            [0, 1, 0, 0, 0, 1, 0, 0, 0, 0],
+            [0, 0, 0, 1, 0, 0, 0, 1, 1, 0],
+            [1, 1, 0, 1, 0, 1, 0, 0, 0, 2],
+            [0, 0, 0, 0, 0, 1, 1, 1, 0, 0],
+            [0, 1, 1, 1, 0, 0, 0, 0, 0, 1],
+            [2, 0, 0, 1, 0, 1, 0, 1, 0, 0],
+            [0, 1, 0, 0, 0, 1, 0, 1, 2, 0],
+            [0, 0, 0, 1, 2, 0, 0, 0, 0, 3]
+        ],
+        startDir: 2,
+        hint: ``
+    }
+];
+
+// ==================== РЎРћРЎРўРћРЇРќРР• РР“Р Р« ====================
+let currentLevel = 0;
+let player = { x: 0, y: 0, dir: 2 };
+let mapData = [];
+let candiesCollected = 0;
+let totalCandies = 0;
+let isRunning = false;
+let victoryShown = false;
+
+const gridEl = document.getElementById('grid');
+const consoleEl = document.getElementById('console');
+const levelInfoEl = document.getElementById('level-info');
+const codeEl = document.getElementById('code');
+const varsPanelEl = document.getElementById('vars-panel');
+const victoryOverlay = document.getElementById('victory-overlay');
+const victoryTitle = document.getElementById('victory-title');
+const victoryEmoji = document.getElementById('victory-emoji');
+const victoryMessage = document.getElementById('victory-message');
+const victoryStats = document.getElementById('victory-stats');
+const btnVictory = document.getElementById('btn-victory');
+const btnRun = document.getElementById('btn-run');
+const speedEl = document.getElementById('speed');
+
+const arrows = ['в–І', 'в–¶', 'в–ј', 'в—Ђ'];
+const dirNames = ['up', 'right', 'down', 'left'];
+
+// ==================== Р›РћР“РР РћР’РђРќРР• ====================
+function log(msg, type = 'info') {
+    const p = document.createElement('div');
+    p.className = `log-${type}`;
+    p.textContent = `> ${msg}`;
+    consoleEl.appendChild(p);
+    consoleEl.scrollTop = consoleEl.scrollHeight;
+}
+function clearLog() { consoleEl.innerHTML = ''; }
+
+// ==================== РЈРџР РђР’Р›Р•РќРР• РЈР РћР’РќРЇРњР ====================
+function initLevel() {
+    const level = levels[currentLevel];
+    mapData = level.map.map(row => [...row]);
+    levelInfoEl.innerHTML = `<b>${level.name}</b><br><i style="color:#ff9800">${level.task}</i>`;
+    candiesCollected = 0;
+    totalCandies = 0;
+    victoryShown = false;
+    clearLog();
+    
+    for (let y = 0; y < mapData.length; y++) {
+        for (let x = 0; x < mapData[y].length; x++) {
+            if (mapData[y][x] === 4) {
+                player.x = x;
+                player.y = y;
+                player.dir = level.startDir;
+                mapData[y][x] = 0;
+            }
+            if (mapData[y][x] === 2) totalCandies++;
+        }
+    }
+    
+    codeEl.value = level.hint || '# РќР°РїРёС€Рё РєРѕРґ Р·РґРµСЃСЊ\n';
+    updateVarsPanel({ x: player.x, y: player.y });
+    render();
+    log(`рџЋѓ РЈСЂРѕРІРµРЅСЊ РЅР°С‡Р°С‚! РЎРѕР±РµСЂРё РІСЃРµ рџЌ¬ (${totalCandies}) Рё РґРѕР±РµСЂРёСЃСЊ РґРѕ рџљЄ`, 'info');
+    log(`рџ’Ў РџРѕРґСЃРєР°Р·РєР°: РЅР°Р¶РјРё "РџСЂРёРјРµСЂ", С‡С‚РѕР±С‹ СѓРІРёРґРµС‚СЊ РіРѕС‚РѕРІС‹Р№ РєРѕРґ`, 'hint');
+}
+
+function resetLevel() {
+    isRunning = false;
+    victoryShown = false;
+    victoryOverlay.style.display = 'none';
+    btnRun.disabled = false;
+    initLevel();
+}
+
+function showHint() {
+    const level = levels[currentLevel];
+    if (level.hint) {
+        codeEl.value = level.hint;
+        log('рџ’Ў РџСЂРёРјРµСЂ РєРѕРґР° Р·Р°РіСЂСѓР¶РµРЅ РІ СЂРµРґР°РєС‚РѕСЂ', 'hint');
+    }
+}
+
+function clearCode() {
+    codeEl.value = '# РќР°РїРёС€Рё СЃРІРѕР№ РєРѕРґ Р·РґРµСЃСЊ\n';
+    log('рџ—‘ РљРѕРґ РѕС‡РёС‰РµРЅ', 'info');
+}
+
+// ==================== Р Р•РќР”Р•Р РРќР“ ====================
+function render() {
+    gridEl.innerHTML = '';
+    gridEl.style.gridTemplateColumns = `repeat(${mapData[0].length}, 55px)`;
+
+    for (let y = 0; y < mapData.length; y++) {
+        for (let x = 0; x < mapData[y].length; x++) {
+            const cell = document.createElement('div');
+            cell.className = 'cell';
+            const val = mapData[y][x];
+            if (val === 1) { cell.classList.add('wall'); cell.textContent = 'рџЄ¦'; }
+            else if (val === 2) cell.textContent = 'рџЌ¬';
+            else if (val === 3) cell.textContent = 'рџљЄ';
+
+            if (x === player.x && y === player.y) {
+                cell.textContent = 'рџЋѓ';
+                cell.classList.add('player');
+                const ind = document.createElement('div');
+                ind.className = `dir-indicator dir-${dirNames[player.dir]}`;
+                ind.textContent = arrows[player.dir];
+                cell.appendChild(ind);
+            }
+            gridEl.appendChild(cell);
+        }
+    }
+}
+
+function updateVarsPanel(vars) {
+    let html = '';
+    for (const name in vars) {
+        html += `<span class="var-item"><span class="var-name">${name}</span> = <span class="var-value">${vars[name]}</span></span>`;
+    }
+    varsPanelEl.innerHTML = html;
+}
+
+// ==================== РРќРўР•Р РџР Р•РўРђРўРћР  PYTHON-РџРћР”РћР‘РќРћР“Рћ РЇР—Р«РљРђ ====================
+
+function getIndent(line) {
+    const match = line.match(/^(\s*)/);
+    return match ? match[1].length : 0;
+}
+
+function findBlockEnd(lines, startIdx, parentIndent) {
+    let i = startIdx;
+    while (i < lines.length) {
+        const line = lines[i];
+        if (line.trim() === '' || line.trim().startsWith('#')) { i++; continue; }
+        const indent = getIndent(line);
+        if (indent <= parentIndent) break;
+        i++;
+    }
+    return i;
+}
+
+// РџР°СЂСЃРµСЂ РІС‹СЂР°Р¶РµРЅРёР№ (СЂРµРєСѓСЂСЃРёРІРЅС‹Р№ СЃРїСѓСЃРє)
+function createExprEvaluator(vars) {
+    return function evalExpr(exprStr) {
+        let expr = exprStr.trim();
+        let pos = 0;
+        
+        function skipWS() {
+            while (pos < expr.length && /\s/.test(expr[pos])) pos++;
+        }
+        function peek() { skipWS(); return expr[pos]; }
+        function matchStr(s) {
+            skipWS();
+            if (expr.startsWith(s, pos)) { pos += s.length; return true; }
+            return false;
+        }
+        function matchKeyword(kw) {
+            skipWS();
+            if (expr.startsWith(kw, pos)) {
+                const next = expr[pos + kw.length];
+                if (!next || !/[a-zA-Z0-9_]/.test(next)) {
+                    pos += kw.length;
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        function parseExpr() { return parseOr(); }
+        
+        function parseOr() {
+            let left = parseAnd();
+            while (matchKeyword('or')) left = Boolean(left) || Boolean(parseAnd());
+            return left;
+        }
+        function parseAnd() {
+            let left = parseNot();
+            while (matchKeyword('and')) left = Boolean(left) && Boolean(parseNot());
+            return left;
+        }
+        function parseNot() {
+            if (matchKeyword('not')) return !parseNot();
+            return parseComparison();
+        }
+        function parseComparison() {
+            let left = parseAddSub();
+            while (true) {
+                skipWS();
+                let op = null;
+                if (expr.startsWith('==', pos)) { op = '=='; pos += 2; }
+                else if (expr.startsWith('!=', pos)) { op = '!='; pos += 2; }
+                else if (expr.startsWith('<=', pos)) { op = '<='; pos += 2; }
+                else if (expr.startsWith('>=', pos)) { op = '>='; pos += 2; }
+                else if (expr[pos] === '<' && expr[pos+1] !== '=') { op = '<'; pos += 1; }
+                else if (expr[pos] === '>' && expr[pos+1] !== '=') { op = '>'; pos += 1; }
+                else break;
+                const right = parseAddSub();
+                if (op === '==') left = left === right;
+                else if (op === '!=') left = left !== right;
+                else if (op === '<') left = left < right;
+                else if (op === '>') left = left > right;
+                else if (op === '<=') left = left <= right;
+                else if (op === '>=') left = left >= right;
+            }
+            return left;
+        }
+        function parseAddSub() {
+            let left = parseMulDiv();
+            while (true) {
+                skipWS();
+                if (expr[pos] === '+') { pos++; left = left + parseMulDiv(); }
+                else if (expr[pos] === '-') { pos++; left = left - parseMulDiv(); }
+                else break;
+            }
+            return left;
+        }
+        function parseMulDiv() {
+            let left = parseUnary();
+            while (true) {
+                skipWS();
+                if (expr[pos] === '*') { pos++; left = left * parseUnary(); }
+                else if (expr[pos] === '/') {
+                    pos++;
+                    const r = parseUnary();
+                    if (r === 0) throw new Error("Р”РµР»РµРЅРёРµ РЅР° РЅРѕР»СЊ");
+                    left = left / r;
+                }
+                else if (expr[pos] === '%') {
+                    pos++;
+                    const r = parseUnary();
+                    if (r === 0) throw new Error("Р”РµР»РµРЅРёРµ РЅР° РЅРѕР»СЊ (РѕСЃС‚Р°С‚РѕРє)");
+                    left = left % r;
+                }
+                else if (expr.startsWith('//', pos)) {
+                    pos += 2;
+                    const r = parseUnary();
+                    if (r === 0) throw new Error("Р”РµР»РµРЅРёРµ РЅР° РЅРѕР»СЊ");
+                    left = Math.floor(left / r);
+                }
+                else break;
+            }
+            return left;
+        }
+        function parseUnary() {
+            skipWS();
+            if (expr[pos] === '-') { pos++; return -parseUnary(); }
+            if (expr[pos] === '+') { pos++; return parseUnary(); }
+            return parsePrimary();
+        }
+        function parsePrimary() {
+            skipWS();
+            if (pos >= expr.length) throw new Error("РќРµРѕР¶РёРґР°РЅРЅС‹Р№ РєРѕРЅРµС† РІС‹СЂР°Р¶РµРЅРёСЏ");
+            
+            // Р§РёСЃР»Рѕ
+            if (/\d/.test(expr[pos]) || (expr[pos] === '.' && /\d/.test(expr[pos+1] || ''))) {
+                let numStr = '';
+                while (pos < expr.length && /[\d.]/.test(expr[pos])) numStr += expr[pos++];
+                const n = parseFloat(numStr);
+                if (isNaN(n)) throw new Error(`РќРµРІРµСЂРЅРѕРµ С‡РёСЃР»Рѕ: ${numStr}`);
+                return n;
+            }
+            
+            // РЎРєРѕР±РєРё
+            if (expr[pos] === '(') {
+                pos++;
+                const val = parseExpr();
+                skipWS();
+                if (expr[pos] !== ')') throw new Error("РћР¶РёРґР°Р»Р°СЃСЊ ')'");
+                pos++;
+                return val;
+            }
+            
+            // РРјСЏ (РїРµСЂРµРјРµРЅРЅР°СЏ РёР»Рё С„СѓРЅРєС†РёСЏ) РёР»Рё РєР»СЋС‡РµРІРѕРµ СЃР»РѕРІРѕ
+            if (/[a-zA-Z_]/.test(expr[pos])) {
+                let name = '';
+                while (pos < expr.length && /[a-zA-Z0-9_]/.test(expr[pos])) name += expr[pos++];
+                
+                if (name === 'True') return true;
+                if (name === 'False') return false;
+                if (name === 'None') return null;
+                
+                skipWS();
+                if (expr[pos] === '(') {
+                    pos++;
+                    const args = [];
+                    skipWS();
+                    if (expr[pos] !== ')') {
+                        args.push(parseExpr());
+                        while (true) {
+                            skipWS();
+                            if (expr[pos] === ',') { pos++; args.push(parseExpr()); }
+                            else break;
+                        }
+                    }
+                    if (expr[pos] !== ')') throw new Error("РћР¶РёРґР°Р»Р°СЃСЊ ')' РїРѕСЃР»Рµ Р°СЂРіСѓРјРµРЅС‚РѕРІ С„СѓРЅРєС†РёРё");
+                    pos++;
+                    
+                    if (name === 'abs') return Math.abs(args[0]);
+                    if (name === 'min') return Math.min(...args);
+                    if (name === 'max') return Math.max(...args);
+                    if (name === 'int') return Math.floor(args[0]);
+                    if (name === 'round') return Math.round(args[0]);
+                    if (name === 'pow') return Math.pow(args[0], args[1] || 0);
+                    throw new Error(`РќРµРёР·РІРµСЃС‚РЅР°СЏ С„СѓРЅРєС†РёСЏ: ${name}`);
+                }
+                
+                if (name in vars) return vars[name];
+                throw new Error(`РќРµРёР·РІРµСЃС‚РЅР°СЏ РїРµСЂРµРјРµРЅРЅР°СЏ: ${name}`);
+            }
+            
+            throw new Error(`РќРµРѕР¶РёРґР°РЅРЅС‹Р№ СЃРёРјРІРѕР»: '${expr[pos]}'`);
+        }
+        
+        try {
+            const result = parseExpr();
+            skipWS();
+            if (pos < expr.length) throw new Error(`РќРµРѕР¶РёРґР°РЅРЅС‹Р№ РѕСЃС‚Р°С‚РѕРє: '${expr.slice(pos)}'`);
+            return result;
+        } catch (e) {
+            throw new Error(`РћС€РёР±РєР° РІ РІС‹СЂР°Р¶РµРЅРёРё '${exprStr}': ${e.message}`);
+        }
+    };
+}
+
+// Р“Р»Р°РІРЅС‹Р№ РёРЅС‚РµСЂРїСЂРµС‚Р°С‚РѕСЂ
+function interpret(code, initialVars) {
+    const lines = code.split('\n');
+    const vars = { ...initialVars };
+    const output = [];
+    const moves = []; // СЃРїРёСЃРѕРє {x, y} РїРѕСЃР»Рµ РєР°Р¶РґРѕРіРѕ РёР·РјРµРЅРµРЅРёСЏ x РёР»Рё y
+    let steps = 0;
+    const MAX_STEPS = 50000;
+    
+    const evalExpr = createExprEvaluator(vars);
+    
+    function executeBlock(startIdx, endIdx, indent) {
+        let i = startIdx;
+        while (i < endIdx) {
+            steps++;
+            if (steps > MAX_STEPS) throw new Error(`РџСЂРµРІС‹С€РµРЅ Р»РёРјРёС‚ С€Р°РіРѕРІ (${MAX_STEPS}). Р’РѕР·РјРѕР¶РЅo Р±РµСЃРєРѕРЅРµС‡РЅС‹Р№ С†РёРєР»?`);
+            
+            const line = lines[i];
+            const trimmed = line.trim();
+            
+            if (trimmed === '' || trimmed.startsWith('#')) { i++; continue; }
+            
+            const lineIndent = getIndent(line);
+            if (lineIndent !== indent) {
+                throw new Error(`РћС€РёР±РєР° РѕС‚СЃС‚СѓРїР° РІ СЃС‚СЂРѕРєРµ ${i+1}. РћР¶РёРґР°Р»РѕСЃСЊ ${indent} РїСЂРѕР±РµР»РѕРІ, РїРѕР»СѓС‡РµРЅРѕ ${lineIndent}.`);
+            }
+            
+            // if / elif / else
+            if (trimmed.startsWith('if ') && trimmed.endsWith(':')) {
+                const condStr = trimmed.slice(3, -1).trim();
+                const blockEnd = findBlockEnd(lines, i+1, indent);
+                
+                if (evalExpr(condStr)) {
+                    executeBlock(i+1, blockEnd, indent + 4);
+                    i = blockEnd;
+                    // РџСЂРѕРїСѓСЃРєР°РµРј РІСЃРµ elif/else
+                    while (i < lines.length) {
+                        const t = lines[i].trim();
+                        if (t.startsWith('elif ') || t === 'else:') {
+                            i = findBlockEnd(lines, i+1, indent);
+                        } else break;
+                    }
+                } else {
+                    i = blockEnd;
+                    let handled = false;
+                    while (i < lines.length) {
+                        const t = lines[i].trim();
+                        if (t.startsWith('elif ') && t.endsWith(':')) {
+                            const elifCond = t.slice(5, -1).trim();
+                            const elifBlockEnd = findBlockEnd(lines, i+1, indent);
+                            if (!handled && evalExpr(elifCond)) {
+                                executeBlock(i+1, elifBlockEnd, indent + 4);
+                                handled = true;
+                            }
+                            i = elifBlockEnd;
+                        } else if (t === 'else:') {
+                            const elseBlockEnd = findBlockEnd(lines, i+1, indent);
+                            if (!handled) {
+                                executeBlock(i+1, elseBlockEnd, indent + 4);
+                            }
+                            i = elseBlockEnd;
+                            break;
+                        } else break;
+                    }
+                }
+                continue;
+            }
+            
+            // for var in range(...)
+            if (trimmed.startsWith('for ') && trimmed.endsWith(':')) {
+                const match = trimmed.match(/^for\s+([a-zA-Z_][a-zA-Z0-9_]*)\s+in\s+range\(([^)]*)\):\s*$/);
+                if (!match) throw new Error(`РќРµРІРµСЂРЅС‹Р№ СЃРёРЅС‚Р°РєСЃРёСЃ for РІ СЃС‚СЂРѕРєРµ ${i+1}. РћР¶РёРґР°РµС‚СЃСЏ: for <РёРјСЏ> in range(...):`);
+                const varName = match[1];
+                const rangeArgsStr = match[2].trim();
+                let rangeArgs = [];
+                if (rangeArgsStr !== '') {
+                    // РџР°СЂСЃРёРј Р°СЂРіСѓРјРµРЅС‚С‹ range, СѓС‡РёС‚С‹РІР°СЏ РІР»РѕР¶РµРЅРЅС‹Рµ СЃРєРѕР±РєРё
+                    let depth = 0, current = '';
+                    for (const ch of rangeArgsStr) {
+                        if (ch === '(') depth++;
+                        else if (ch === ')') depth--;
+                        if (ch === ',' && depth === 0) {
+                            rangeArgs.push(evalExpr(current));
+                            current = '';
+                        } else current += ch;
+                    }
+                    if (current.trim()) rangeArgs.push(evalExpr(current));
+                }
+                
+                let start = 0, end, step = 1;
+                if (rangeArgs.length === 1) end = rangeArgs[0];
+                else if (rangeArgs.length === 2) { start = rangeArgs[0]; end = rangeArgs[1]; }
+                else if (rangeArgs.length === 3) { start = rangeArgs[0]; end = rangeArgs[1]; step = rangeArgs[2]; }
+                else throw new Error(`range() РїСЂРёРЅРёРјР°РµС‚ 1-3 Р°СЂРіСѓРјРµРЅС‚Р°, РїРѕР»СѓС‡РµРЅРѕ ${rangeArgs.length}`);
+                
+                if (step === 0) throw new Error("step РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ 0 РІ range()");
+                
+                const blockEnd = findBlockEnd(lines, i+1, indent);
+                const iterLimit = 10000;
+                let iters = 0;
+                if (step > 0) {
+                    for (let v = start; v < end; v += step) {
+                        iters++;
+                        if (iters > iterLimit) throw new Error(`РЎР»РёС€РєРѕРј РјРЅРѕРіРѕ РёС‚РµСЂР°С†РёР№ for РІ СЃС‚СЂРѕРєРµ ${i+1}`);
+                        vars[varName] = v;
+                        executeBlock(i+1, blockEnd, indent + 4);
+                    }
+                } else {
+                    for (let v = start; v > end; v += step) {
+                        iters++;
+                        if (iters > iterLimit) throw new Error(`РЎР»РёС€РєРѕРј РјРЅРѕРіРѕ РёС‚РµСЂР°С†РёР№ for РІ СЃС‚СЂРѕРєРµ ${i+1}`);
+                        vars[varName] = v;
+                        executeBlock(i+1, blockEnd, indent + 4);
+                    }
+                }
+                i = blockEnd;
+                continue;
+            }
+            
+            // while
+            if (trimmed.startsWith('while ') && trimmed.endsWith(':')) {
+                const condStr = trimmed.slice(6, -1).trim();
+                const blockEnd = findBlockEnd(lines, i+1, indent);
+                let iterations = 0;
+                while (evalExpr(condStr)) {
+                    iterations++;
+                    if (iterations > 5000) throw new Error(`РЎР»РёС€РєРѕРј РјРЅРѕРіРѕ РёС‚РµСЂР°С†РёР№ while РІ СЃС‚СЂРѕРєРµ ${i+1} (РІРѕР·РјРѕР¶РЅРѕ Р±РµСЃРєРѕРЅРµС‡РЅС‹Р№ С†РёРєР»)`);
+                    executeBlock(i+1, blockEnd, indent + 4);
+                }
+                i = blockEnd;
+                continue;
+            }
+            
+            // print(...)
+            if (trimmed.startsWith('print(') && trimmed.endsWith(')')) {
+                const argStr = trimmed.slice(6, -1).trim();
+                if (argStr === '') {
+                    output.push('');
+                } else {
+                    // РџРѕРґРґРµСЂР¶РєР° РЅРµСЃРєРѕР»СЊРєРёС… Р°СЂРіСѓРјРµРЅС‚РѕРІ С‡РµСЂРµР· Р·Р°РїСЏС‚СѓСЋ
+                    let args = [], depth = 0, current = '';
+                    for (const ch of argStr) {
+                        if (ch === '(') depth++;
+                        else if (ch === ')') depth--;
+                        if (ch === ',' && depth === 0) {
+                            args.push(String(evalExpr(current)));
+                            current = '';
+                        } else current += ch;
+                    }
+                    if (current.trim()) args.push(String(evalExpr(current)));
+                    output.push(args.join(' '));
+                }
+                i++;
+                continue;
+            }
+            
+            // РџСЂРёСЃРІР°РёРІР°РЅРёРµ
+            // РС‰РµРј РїРµСЂРІРѕРµ '=', РЅРµ РІС…РѕРґСЏС‰РµРµ РІ ==, !=, <=, >=
+            let eqIdx = -1;
+            for (let k = 0; k < trimmed.length; k++) {
+                if (trimmed[k] === '=') {
+                    const prev = k > 0 ? trimmed[k-1] : '';
+                    const next = k < trimmed.length - 1 ? trimmed[k+1] : '';
+                    if (prev !== '!' && prev !== '<' && prev !== '>' && prev !== '=' && next !== '=') {
+                        eqIdx = k;
+                        break;
+                    }
+                }
+            }
+            
+            if (eqIdx > 0) {
+                const varName = trimmed.slice(0, eqIdx).trim();
+                if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(varName)) {
+                    throw new Error(`РќРµРґРѕРїСѓСЃС‚РёРјРѕРµ РёРјСЏ РїРµСЂРµРјРµРЅРЅРѕР№: '${varName}' (СЃС‚СЂРѕРєР° ${i+1})`);
+                }
+                const exprStr = trimmed.slice(eqIdx+1).trim();
+                if (!exprStr) throw new Error(`РџСѓСЃС‚РѕРµ РІС‹СЂР°Р¶РµРЅРёРµ РїРѕСЃР»Рµ '=' РІ СЃС‚СЂРѕРєРµ ${i+1}`);
+                const value = evalExpr(exprStr);
+                vars[varName] = value;
+                if (varName === 'x' || varName === 'y') {
+                    moves.push({ x: vars.x !== undefined ? vars.x : initialVars.x, 
+                                 y: vars.y !== undefined ? vars.y : initialVars.y });
+                }
+                i++;
+                continue;
+            }
+            
+            throw new Error(`РќРµРїРѕРЅСЏС‚РЅР°СЏ СЃС‚СЂРѕРєР° ${i+1}: '${trimmed}'`);
+        }
+        return i;
+    }
+    
+    executeBlock(0, lines.length, 0);
+    return { vars, output, moves };
+}
+
+// ==================== Р—РђРџРЈРЎРљ РљРћР”Рђ ====================
+async function runCode() {
+    if (isRunning) return;
+    isRunning = true;
+    btnRun.disabled = true;
+    btnRun.textContent = 'вЏі Р’С‹РїРѕР»РЅСЏРµС‚СЃСЏ...';
+    
+    // РЎР±СЂР°СЃС‹РІР°РµРј СѓСЂРѕРІРµРЅСЊ РґР»СЏ С‡РёСЃС‚РѕРіРѕ Р·Р°РїСѓСЃРєР°
+    const level = levels[currentLevel];
+    mapData = level.map.map(row => [...row]);
+    candiesCollected = 0;
+    totalCandies = 0;
+    victoryShown = false;
+    
+    for (let y = 0; y < mapData.length; y++) {
+        for (let x = 0; x < mapData[y].length; x++) {
+            if (mapData[y][x] === 4) {
+                player.x = x;
+                player.y = y;
+                player.dir = level.startDir;
+                mapData[y][x] = 0;
+            }
+            if (mapData[y][x] === 2) totalCandies++;
+        }
+    }
+    
+    clearLog();
+    render();
+    
+    const code = codeEl.value;
+    const initialVars = { x: player.x, y: player.y };
+    
+    try {
+        log('рџђЌ Р—Р°РїСѓСЃРє РїСЂРѕРіСЂР°РјРјС‹...', 'info');
+        const result = interpret(code, initialVars);
+        
+        log(`вњ… РџСЂРѕРіСЂР°РјРјР° РІС‹РїРѕР»РЅРµРЅР°. РЁР°РіРѕРІ РґРІРёР¶РµРЅРёСЏ: ${result.moves.length}`, 'success');
+        if (result.output.length > 0) {
+            log(`рџ“¤ Р’С‹РІРѕРґ print():`, 'info');
+            result.output.forEach(line => log(`   ${line}`, 'output'));
+        }
+        
+        updateVarsPanel(result.vars);
+        
+        // РђРЅРёРјР°С†РёСЏ РґРІРёР¶РµРЅРёСЏ
+        await animateMoves(result.moves);
+        
+    } catch (e) {
+        log(`вќЊ РћС€РёР±РєР°: ${e.message}`, 'error');
+    }
+    
+    isRunning = false;
+    btnRun.disabled = false;
+    btnRun.textContent = 'в–¶ Р—Р°РїСѓСЃС‚РёС‚СЊ';
+}
+
+function canMoveTo(x, y) {
+    if (y < 0 || y >= mapData.length || x < 0 || x >= mapData[0].length) return false;
+    if (mapData[y][x] === 1) return false;
+    return true;
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function animateMoves(moves) {
+    const speed = parseInt(speedEl.value);
+    let curX = player.x, curY = player.y;
+    
+    for (const move of moves) {
+        if (!isRunning) break;
+        
+        // Р”РІРёРіР°РµРјСЃСЏ РїРѕ X
+        while (curX !== move.x) {
+            const step = Math.sign(move.x - curX);
+            const newX = curX + step;
+            if (!canMoveTo(newX, curY)) {
+                log(`рџ§± РќРµР»СЊР·СЏ РґРІРёРіР°С‚СЊСЃСЏ РІ (x=${newX}, y=${curY}) вЂ” СЃС‚РµРЅР° РёР»Рё РіСЂР°РЅРёС†Р°!`, 'error');
+                player.dir = step > 0 ? 1 : 3;
+                render();
+                return;
+            }
+            curX = newX;
+            player.x = curX;
+            player.dir = step > 0 ? 1 : 3;
+            await stepAnimate(speed);
+            if (victoryShown) return;
+        }
+        // Р”РІРёРіР°РµРјСЃСЏ РїРѕ Y
+        while (curY !== move.y) {
+            const step = Math.sign(move.y - curY);
+            const newY = curY + step;
+            if (!canMoveTo(curX, newY)) {
+                log(`рџ§± РќРµР»СЊР·СЏ РґРІРёРіР°С‚СЊСЃСЏ РІ (x=${curX}, y=${newY}) вЂ” СЃС‚РµРЅР° РёР»Рё РіСЂР°РЅРёС†Р°!`, 'error');
+                player.dir = step > 0 ? 2 : 0;
+                render();
+                return;
+            }
+            curY = newY;
+            player.y = curY;
+            player.dir = step > 0 ? 2 : 0;
+            await stepAnimate(speed);
+            if (victoryShown) return;
+        }
+    }
+}
+
+async function stepAnimate(speed) {
+    // РџСЂРѕРІРµСЂРєР° РєРѕРЅС„РµС‚С‹
+    if (mapData[player.y][player.x] === 2) {
+        mapData[player.y][player.x] = 0;
+        candiesCollected++;
+        log(`рџЌ¬ РљРѕРЅС„РµС‚Р° СЃРѕР±СЂР°РЅР°! (${candiesCollected}/${totalCandies})`, 'success');
+    }
+    render();
+    updateVarsPanel({ x: player.x, y: player.y, 'рџЌ¬': `${candiesCollected}/${totalCandies}` });
+    await sleep(speed);
+    
+    // РџСЂРѕРІРµСЂРєР° РїРѕР±РµРґС‹
+    if (mapData[player.y][player.x] === 3 && candiesCollected === totalCandies && !victoryShown) {
+        log(`рџЋ‰ РЈСЂРѕРІРµРЅСЊ РїСЂРѕР№РґРµРЅ! Р’СЃРµ РєРѕРЅС„РµС‚С‹ СЃРѕР±СЂР°РЅС‹!`, 'success');
+        setTimeout(() => showVictory(), 400);
+    }
+}
+
+// ==================== РџРћР‘Р•Р”Рђ ====================
+function showVictory() {
+    victoryShown = true;
+    const isLastLevel = currentLevel >= levels.length - 1;
+    
+    if (isLastLevel) {
+        victoryTitle.textContent = 'рџЏ† Р’РЎР• РЈР РћР’РќР РџР РћР™Р”Р•РќР«! рџЏ†';
+        victoryEmoji.textContent = 'рџЋѓрџ‘»рџЋѓ';
+        victoryMessage.innerHTML = `РџРѕР·РґСЂР°РІР»СЏРµРј! РўС‹ РЅР°СЃС‚РѕСЏС‰РёР№ Python-РјР°СЃС‚РµСЂ РҐСЌР»Р»РѕСѓРёРЅР°!<br>РўС‹РєРІР° РїСЂРѕС€Р»Р° С‡РµСЂРµР· РІСЃРµ РёСЃРїС‹С‚Р°РЅРёСЏ!`;
+        btnVictory.textContent = 'рџ”„ РќР°С‡Р°С‚СЊ СЃРЅР°С‡Р°Р»Р°';
+        btnVictory.onclick = () => { currentLevel = 0; closeVictory(); };
+    } else {
+        victoryTitle.textContent = 'рџЋ‰ РЈР РћР’Р•РќР¬ РџР РћР™Р”Р•Рќ! рџЋ‰';
+        victoryEmoji.textContent = 'рџЋѓрџЌ¬рџЋѓ';
+        victoryMessage.innerHTML = `РћС‚Р»РёС‡РЅРѕ! РўС‹РєРІР° РЅР°РїРёСЃР°Р»Р° РїСЂР°РІРёР»СЊРЅС‹Р№ РєРѕРґ<br>Рё РґРѕР±СЂР°Р»Р°СЃСЊ РґРѕ РІС‹С…РѕРґР°!`;
+        btnVictory.textContent = 'вћЎ РЎР»РµРґСѓСЋС‰РёР№ СѓСЂРѕРІРµРЅСЊ';
+        btnVictory.onclick = () => { currentLevel++; closeVictory(); };
+    }
+    
+    victoryStats.innerHTML = `РЈСЂРѕРІРµРЅСЊ: ${currentLevel + 1} РёР· ${levels.length}<br>РЎРѕР±СЂР°РЅРѕ РєРѕРЅС„РµС‚: ${candiesCollected} РёР· ${totalCandies} рџЌ¬`;
+    victoryOverlay.style.display = 'flex';
+    createFallingCandies();
+}
+
+function closeVictory() {
+    victoryOverlay.style.display = 'none';
+    victoryShown = false;
+    initLevel();
+}
+
+function createFallingCandies() {
+    const emojis = ['рџЌ¬', 'рџЌ­', 'рџ‘»', 'рџ•·пёЏ', 'рџЋѓ', 'рџ¦‡'];
+    for (let i = 0; i < 30; i++) {
+        setTimeout(() => {
+            const candy = document.createElement('div');
+            candy.className = 'falling-candy';
+            candy.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+            candy.style.left = Math.random() * 100 + 'vw';
+            candy.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            document.body.appendChild(candy);
+            setTimeout(() => candy.remove(), 5500);
+        }, i * 100);
+    }
+}
+
+// РћР±СЂР°Р±РѕС‚РєР° Tab РІ СЂРµРґР°РєС‚РѕСЂРµ
+codeEl.addEventListener('keydown', function(e) {
+    if (e.key === 'Tab') {
+        e.preventDefault();
+        const start = this.selectionStart;
+        const end = this.selectionEnd;
+        this.value = this.value.substring(0, start) + '    ' + this.value.substring(end);
+        this.selectionStart = this.selectionEnd = start + 4;
+    }
+});
+
+// Р—Р°РїСѓСЃРє РїРѕ Ctrl+Enter
+codeEl.addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        runCode();
+    }
+});
+
+// РЎС‚Р°СЂС‚
+initLevel();
+</script>
+</body>
+</html>

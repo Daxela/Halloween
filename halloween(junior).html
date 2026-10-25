@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> РҐСЌР»Р»РѕСѓРёРЅ: РџСѓС‚СЊ РўС‹РєРІС‹ вЂ” РґР»СЏ РјР°Р»С‹С€РµР№</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            background-color: #1a0b2e;
+            color: #ff9800;
+            font-family: 'Comic Sans MS', 'Courier New', cursive;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 15px;
+            background-image: radial-gradient(circle at top, #2d1b4e 0%, #1a0b2e 100%);
+        }
+        h1 { 
+            text-shadow: 0 0 10px #ff5722; 
+            margin: 0 0 5px 0;
+            font-size: 2em;
+        }
+        #level-info { 
+            font-size: 1.1em; 
+            color: #ba68c8; 
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        #hint {
+            background: rgba(0, 188, 212, 0.15);
+            border: 2px dashed #00bcd4;
+            color: #00bcd4;
+            padding: 8px 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            max-width: 900px;
+            text-align: center;
+        }
+        
+        #game-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        #grid {
+            display: grid;
+            gap: 2px;
+            background-color: #4a148c;
+            padding: 5px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px #9c27b0;
+        }
+        .cell {
+            width: 55px;
+            height: 55px;
+            background-color: #2a0a4a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            position: relative;
+        }
+        .wall { background-color: #111; box-shadow: inset 0 0 10px #000; }
+        .player { transition: all 0.3s ease; }
+        
+        .direction-indicator {
+            position: absolute;
+            font-size: 14px;
+            color: #ffeb3b;
+            opacity: 0.9;
+            text-shadow: 0 0 4px #ffeb3b;
+            pointer-events: none;
+        }
+        .dir-up    { top: 2px; left: 50%; transform: translateX(-50%); }
+        .dir-right { right: 2px; top: 50%; transform: translateY(-50%); }
+        .dir-down  { bottom: 2px; left: 50%; transform: translateX(-50%); }
+        .dir-left  { left: 2px; top: 50%; transform: translateY(-50%); }
+
+        #controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-width: 500px;
+            max-width: 750px;
+        }
+
+        .panel-title {
+            font-size: 16px;
+            color: #ff9800;
+            margin: 0 0 8px 0;
+            text-align: center;
+            text-shadow: 0 0 5px #ff5722;
+        }
+
+        #blocks-area {
+            display: flex;
+            gap: 15px;
+            align-items: stretch;
+            flex-wrap: wrap;
+        }
+
+        #palette {
+            flex: 1;
+            min-width: 240px;
+            background: rgba(74, 20, 140, 0.3);
+            border: 2px solid #9c27b0;
+            border-radius: 10px;
+            padding: 10px;
+        }
+        #palette-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .puzzle-block {
+            position: relative;
+            padding: 10px 6px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            text-align: center;
+            user-select: none;
+            transition: transform 0.15s, box-shadow 0.15s;
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            min-height: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            clip-path: polygon(
+                0% 15%, 35% 15%, 35% 0%, 65% 0%, 65% 15%, 100% 15%, 
+                100% 85%, 65% 85%, 65% 100%, 35% 100%, 35% 85%, 0% 85%
+            );
+        }
+        .puzzle-block:hover {
+            transform: scale(1.05);
+            filter: brightness(1.2);
+        }
+        .puzzle-block:active { transform: scale(0.95); }
+        .puzzle-block .icon { font-size: 20px; line-height: 1; }
+        .puzzle-block .label { font-size: 11px; opacity: 0.95; }
+
+        .puzzle-block-input {
+            position: relative;
+            padding: 8px 4px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            text-align: center;
+            user-select: none;
+            transition: transform 0.15s, box-shadow 0.15s;
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            min-height: 70px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            clip-path: polygon(
+                0% 15%, 35% 15%, 35% 0%, 65% 0%, 65% 15%, 100% 15%, 
+                100% 85%, 65% 85%, 65% 100%, 35% 100%, 35% 85%, 0% 85%
+            );
+        }
+        .puzzle-block-input:hover {
+            transform: scale(1.05);
+            filter: brightness(1.2);
+        }
+        .puzzle-block-input:active { transform: scale(0.95); }
+        .puzzle-block-input .icon { font-size: 20px; line-height: 1; }
+        .puzzle-block-input .label-row {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+        }
+        .puzzle-block-input .label-text {
+            font-size: 11px;
+            opacity: 0.95;
+        }
+        
+        .count-input {
+            width: 32px;
+            height: 24px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            font-family: inherit;
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 4px;
+            background: rgba(0,0,0,0.4);
+            color: #fff;
+            cursor: pointer;
+            padding: 0;
+        }
+        .count-input:focus {
+            outline: none;
+            border-color: #ffeb3b;
+            background: rgba(0,0,0,0.7);
+        }
+        .count-input::-webkit-outer-spin-button,
+        .count-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .count-input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        .count-controls {
+            display: flex;
+            gap: 2px;
+            align-items: center;
+        }
+        .count-btn {
+            width: 22px;
+            height: 22px;
+            border: 1px solid rgba(255,255,255,0.5);
+            border-radius: 4px;
+            background: rgba(0,0,0,0.4);
+            color: #fff;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            line-height: 1;
+            transition: 0.15s;
+        }
+        .count-btn:hover {
+            background: rgba(0,0,0,0.7);
+            transform: scale(1.1);
+        }
+        .count-btn:active { transform: scale(0.9); }
+
+        .block-up    { background: linear-gradient(135deg, #ff6f00, #ff9800); }
+        .block-down  { background: linear-gradient(135deg, #6a1b9a, #9c27b0); }
+        .block-left  { background: linear-gradient(135deg, #00838f, #00acc1); }
+        .block-right { background: linear-gradient(135deg, #c62828, #ef5350); }
+
+        #workspace-container {
+            flex: 1;
+            min-width: 240px;
+            background: rgba(13, 5, 20, 0.6);
+            border: 2px dashed #ff9800;
+            border-radius: 10px;
+            padding: 10px;
+            min-height: 200px;
+            max-height: 380px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        #workspace {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+            flex: 1;
+        }
+        #workspace-empty {
+            color: #666;
+            text-align: center;
+            padding: 30px 10px;
+            font-size: 14px;
+            margin: auto;
+        }
+
+        .program-block {
+            position: relative;
+            width: 100%;
+            max-width: 220px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin: -2px 0;
+            clip-path: polygon(
+                0% 15%, 35% 15%, 35% 0%, 65% 0%, 65% 15%, 100% 15%, 
+                100% 85%, 65% 85%, 65% 100%, 35% 100%, 35% 85%, 0% 85%
+            );
+            animation: blockAppear 0.3s ease-out;
+        }
+        @keyframes blockAppear {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .program-block .block-content {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+        }
+        .program-block .block-icon { font-size: 18px; }
+        .program-block .block-controls { display: flex; gap: 3px; }
+        
+        .block-btn {
+            background: rgba(0,0,0,0.4);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 4px;
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            transition: 0.15s;
+        }
+        .block-btn:hover { background: rgba(0,0,0,0.7); transform: scale(1.1); }
+        .block-btn.delete { background: rgba(244, 67, 54, 0.6); }
+        .block-btn.delete:hover { background: rgba(244, 67, 54, 0.9); }
+
+        .action-buttons { display: flex; gap: 10px; }
+        button.action-btn {
+            flex: 1;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+        .btn-run { 
+            background: linear-gradient(135deg, #ff9800, #ff5722); 
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(255, 87, 34, 0.4);
+        }
+        .btn-run:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(255, 87, 34, 0.6); }
+        .btn-clear { 
+            background: linear-gradient(135deg, #9c27b0, #6a1b9a); 
+            color: #fff;
+        }
+        .btn-clear:hover { transform: translateY(-2px); }
+        .btn-reset { 
+            background: linear-gradient(135deg, #455a64, #263238); 
+            color: #fff;
+        }
+        .btn-reset:hover { transform: translateY(-2px); }
+
+        #console {
+            margin-top: 15px;
+            width: 100%;
+            max-width: 900px;
+            height: 100px;
+            background-color: #000;
+            border: 2px solid #ff5722;
+            border-radius: 8px;
+            padding: 10px;
+            overflow-y: auto;
+            font-size: 13px;
+            color: #ccc;
+            font-family: 'Courier New', monospace;
+        }
+        .log-success { color: #4caf50; }
+        .log-error { color: #f44336; }
+        .log-info { color: #ff9800; }
+        
+        .legend { 
+            font-size: 13px; 
+            color: #aaa; 
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        .new-feature {
+            background: linear-gradient(45deg, #ff6f00, #ff9800);
+            color: #000;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+            font-size: 14px;
+            animation: pulse 2s infinite;
+            display: none;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        #victory-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+        #victory-modal {
+            background: linear-gradient(135deg, #2d1b4e 0%, #4a148c 50%, #2d1b4e 100%);
+            border: 4px solid #ff9800;
+            border-radius: 20px;
+            padding: 30px 40px;
+            text-align: center;
+            box-shadow: 0 0 40px #ff9800, 0 0 80px #ff5722;
+            animation: modalAppear 0.6s ease-out;
+            max-width: 450px;
+            position: relative;
+            overflow: hidden;
+        }
+        @keyframes modalAppear {
+            0% { transform: scale(0.3) rotate(-10deg); opacity: 0; }
+            50% { transform: scale(1.1) rotate(3deg); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        #victory-modal::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(255, 152, 0, 0.1), transparent, rgba(255, 87, 34, 0.1), transparent);
+            animation: rotate 4s linear infinite;
+        }
+        .victory-content { position: relative; z-index: 1; }
+        .victory-title {
+            font-size: 36px;
+            margin: 0 0 15px 0;
+            color: #ff9800;
+            text-shadow: 0 0 10px #ff5722, 0 0 20px #ff5722;
+            animation: titleBounce 1s ease-in-out infinite;
+        }
+        @keyframes titleBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        .victory-emoji {
+            font-size: 56px;
+            margin: 15px 0;
+            animation: emojiSpin 2s ease-in-out infinite;
+        }
+        @keyframes emojiSpin {
+            0%, 100% { transform: rotate(-5deg) scale(1); }
+            50% { transform: rotate(5deg) scale(1.1); }
+        }
+        .victory-message {
+            font-size: 18px;
+            color: #fff;
+            margin: 15px 0;
+            line-height: 1.4;
+        }
+        .victory-stats {
+            font-size: 15px;
+            color: #ba68c8;
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+        .btn-victory {
+            background: linear-gradient(45deg, #ff9800, #ff5722);
+            color: #fff;
+            font-size: 18px;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 15px;
+            transition: all 0.3s;
+            font-family: inherit;
+            box-shadow: 0 5px 15px rgba(255, 152, 0, 0.5);
+        }
+        .btn-victory:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 152, 0, 0.7);
+        }
+
+        .falling-candy {
+            position: fixed;
+            font-size: 28px;
+            top: -50px;
+            animation: fall linear forwards;
+            pointer-events: none;
+            z-index: 999;
+        }
+        @keyframes fall {
+            to { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+        }
+
+        .program-block.active {
+            outline: 3px solid #ffeb3b;
+            outline-offset: 2px;
+            filter: brightness(1.3);
+            z-index: 10;
+        }
+
+        @media (max-width: 900px) {
+            #controls { min-width: 0; width: 100%; max-width: 500px; }
+            #blocks-area { flex-direction: column; }
+            #palette, #workspace-container { min-width: 0; width: 100%; }
+        }
+        @media (max-width: 600px) {
+            #game-container { flex-direction: column; align-items: center; }
+            .cell { width: 45px; height: 45px; font-size: 24px; }
+            #palette-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>рџЋѓ РҐСЌР»Р»РѕСѓРёРЅ: РџСѓС‚СЊ РўС‹РєРІС‹ рџ‘»</h1>
+    <div id="level-info">РЈСЂРѕРІРµРЅСЊ 1</div>
+    <div id="hint">рџ’Ў РЎРѕР±РёСЂР°Р№ РєРѕРјР°РЅРґСѓ РёР· Р±Р»РѕРєРѕРІ-РїР°Р·Р»РѕРІ Рё РІРµРґРё С‚С‹РєРІСѓ Рє РІС‹С…РѕРґСѓ!</div>
+
+    <div id="game-container">
+        <div id="grid"></div>
+        <div id="controls">
+            <div class="new-feature" id="new-feature"></div>
+            
+            <div id="blocks-area">
+                <div id="palette">
+                    <div class="panel-title">рџ§© Р‘Р»РѕРєРё РєРѕРјР°РЅРґ</div>
+                    <div id="palette-grid"></div>
+                </div>
+
+                <div id="workspace-container">
+                    <div class="panel-title">рџ“њ РўРІРѕСЏ РїСЂРѕРіСЂР°РјРјР°</div>
+                    <div id="workspace">
+                        <div id="workspace-empty">РќР°Р¶РјРё РЅР° Р±Р»РѕРє СЃР»РµРІР°,<br>С‡С‚РѕР±С‹ РґРѕР±Р°РІРёС‚СЊ РµРіРѕ СЃСЋРґР° рџ‘€</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="action-btn btn-run" onclick="runProgram()">в–¶ Р—Р°РїСѓСЃС‚РёС‚СЊ</button>
+                <button class="action-btn btn-clear" onclick="clearProgram()">рџ—‘ РћС‡РёСЃС‚РёС‚СЊ</button>
+            </div>
+            <button class="action-btn btn-reset" onclick="resetLevel()">рџ”„ РЎР±СЂРѕСЃ СѓСЂРѕРІРЅСЏ</button>
+            
+            <div class="legend">
+                рџЋѓ РўС‹РєРІР° |  РљРѕРЅС„РµС‚Р° | рџљЄ Р’С‹С…РѕРґ | рџЄ¦ РЎС‚РµРЅР°<br>
+                РЎРѕР±РµСЂРё РІСЃРµ рџЌ¬ Рё РґРѕР№РґРё РґРѕ рџљЄ!
+            </div>
+        </div>
+    </div>
+
+    <div id="console"></div>
+
+    <div id="victory-overlay">
+        <div id="victory-modal">
+            <div class="victory-content">
+                <div class="victory-title" id="victory-title">рџЋ‰ РЈР РћР’Р•РќР¬ РџР РћР™Р”Р•Рќ! рџЋ‰</div>
+                <div class="victory-emoji" id="victory-emoji">рџЋѓрџЌ¬рџЋѓ</div>
+                <div class="victory-message" id="victory-message">
+                    РўС‹РєРІР° СѓСЃРїРµС€РЅРѕ РґРѕР±СЂР°Р»Р°СЃСЊ РґРѕ РІС‹С…РѕРґР°!
+                </div>
+                <div class="victory-stats" id="victory-stats"></div>
+                <button class="btn-victory" id="btn-victory" onclick="closeVictory()">
+                    вћЎ РЎР»РµРґСѓСЋС‰РёР№ СѓСЂРѕРІРµРЅСЊ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const levels = [
+            {
+                name: "РЈСЂРѕРІРµРЅСЊ 1: РўС‹РєРІРµРЅРЅС‹Р№ РїРµСЂРµСѓР»РѕРє",
+                hint: "рџ’Ў РСЃРїРѕР»СЊР·СѓР№ Р±Р»РѕРєРё СЃРѕ СЃС‚СЂРµР»РєР°РјРё вЂ” РєР°Р¶РґС‹Р№ Р±Р»РѕРє СЌС‚Рѕ РѕРґРёРЅ С€Р°Рі!",
+                map: [
+                    [4, 0, 0, 0],
+                    [1, 1, 0, 1],
+                    [0, 2, 0, 0],
+                    [0, 1, 0, 3]
+                ],
+                startDir: 2,
+                features: { base: true, input: false, wall: false }
+            },
+            {
+                name: "РЈСЂРѕРІРµРЅСЊ 2: Р—Р°Р±СЂРѕС€РµРЅРЅРѕРµ РєР»Р°РґР±РёС‰Рµ",
+                hint: "рџ’Ў РЎРЅРѕРІР° С‚РѕР»СЊРєРѕ РѕРґРёРЅРѕС‡РЅС‹Рµ С€Р°РіРё. РЎРѕР±РµСЂРё РєРѕРЅС„РµС‚С‹ Рё РЅР°Р№РґРё РІС‹С…РѕРґ!",
+                map: [
+                    [4, 0, 0, 0, 0],
+                    [1, 1, 0, 1, 0],
+                    [0, 0, 0, 1, 2],
+                    [0, 1, 2, 0, 0],
+                    [0, 0, 0, 0, 3]
+                ],
+                startDir: 2,
+                features: { base: true, input: false, wall: false }
+            },
+            {
+                name: "РЈСЂРѕРІРµРЅСЊ 3: Р”РѕРј СЃ РїСЂРёРІРёРґРµРЅРёСЏРјРё",
+                hint: "вњЁ РќРѕРІРёРЅРєР°! РџРѕСЏРІРёР»РёСЃСЊ Р±Р»РѕРєРё СЃ РѕРєРѕС€РєРѕРј вЂ” РІРїРёС€Рё С‡РёСЃР»Рѕ С€Р°РіРѕРІ!",
+                map: [
+                    [4, 0, 1, 0, 0, 0],
+                    [0, 0, 1, 0, 1, 0],
+                    [0, 2, 0, 0, 1, 0],
+                    [1, 1, 1, 0, 0, 2],
+                    [0, 0, 0, 0, 1, 0],
+                    [0, 1, 2, 0, 0, 3]
+                ],
+                startDir: 2,
+                features: { base: true, input: true, wall: false }
+            },
+            {
+                name: "РЈСЂРѕРІРµРЅСЊ 4: Р›РµСЃРЅР°СЏ С‚СЂРѕРїР°",
+                hint: "рџ’Ў РџСЂРѕРґРѕР»Р¶Р°Р№ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ Р±Р»РѕРєРё СЃ С‡РёСЃР»Р°РјРё вЂ” РїРёС€Рё СЃРєРѕР»СЊРєРѕ С€Р°РіРѕРІ РЅСѓР¶РЅРѕ!",
+                map: [
+                    [4, 0, 0, 0, 0, 0, 0],
+                    [0, 1, 0, 1, 1, 0, 1],
+                    [2, 0, 0, 0, 0, 0, 2],
+                    [1, 1, 1, 1, 0, 1, 0],
+                    [0, 0, 2, 0, 0, 0, 3]
+                ],
+                startDir: 2,
+                features: { base: true, input: true, wall: false }
+            },
+            {
+                name: "РЈСЂРѕРІРµРЅСЊ 5: Р—Р°РјРѕРє Р”СЂР°РєСѓР»С‹",
+                hint: "вњЁ РќРѕРІРёРЅРєР°! Р‘Р»РѕРєРё В«РґРѕ СЃС‚РµРЅС‹В» вЂ” С‚С‹РєРІР° Р±РµР¶РёС‚, РїРѕРєР° РЅРµ СѓРїСЂС‘С‚СЃСЏ!",
+                map: [
+                    [4, 0, 1, 0, 0, 0, 1, 0],
+                    [0, 0, 1, 0, 1, 0, 1, 0],
+                    [0, 2, 0, 0, 1, 0, 0, 2],
+                    [1, 1, 1, 0, 1, 1, 1, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 1, 1, 1, 1, 0, 1, 2],
+                    [2, 0, 0, 0, 0, 0, 1, 0],
+                    [1, 0, 1, 0, 1, 0, 0, 3]
+                ],
+                startDir: 2,
+                features: { base: true, input: true, wall: true }
+            },
+            {
+                name: "РЈСЂРѕРІРµРЅСЊ 6: Р›РѕРіРѕРІРѕ Р¤СЂР°РЅРєРµРЅС€С‚РµР№РЅР°",
+                hint: "рџ’Ў Р¤РёРЅР°Р»СЊРЅРѕРµ РёСЃРїС‹С‚Р°РЅРёРµ! Р’СЃРµ Р±Р»РѕРєРё РІ С‚РІРѕС‘Рј СЂР°СЃРїРѕСЂСЏР¶РµРЅРёРё!",
+                map: [
+                    [4, 0, 0, 1, 0, 0, 0, 1, 0, 0],
+                    [0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+                    [0, 1, 0, 0, 0, 1, 0, 0, 0, 0],
+                    [0, 0, 0, 1, 0, 0, 0, 1, 1, 0],
+                    [1, 1, 0, 1, 0, 1, 0, 0, 0, 2],
+                    [0, 0, 0, 0, 0, 1, 1, 1, 0, 0],
+                    [0, 1, 1, 1, 0, 0, 0, 0, 0, 1],
+                    [2, 0, 0, 1, 0, 1, 0, 1, 0, 0],
+                    [0, 1, 0, 0, 0, 1, 0, 1, 2, 0],
+                    [0, 0, 0, 1, 2, 0, 0, 0, 0, 3]
+                ],
+                startDir: 2,
+                features: { base: true, input: true, wall: true }
+            }
+        ];
+
+        let currentLevel = 0;
+        let player = { x: 0, y: 0, dir: 0 };
+        let mapData = [];
+        let candiesCollected = 0;
+        let totalCandies = 0;
+        let isRunning = false;
+        let victoryShown = false;
+        let program = [];
+        let blockIdCounter = 0;
+
+        const gridEl = document.getElementById('grid');
+        const consoleEl = document.getElementById('console');
+        const levelInfoEl = document.getElementById('level-info');
+        const hintEl = document.getElementById('hint');
+        const newFeatureEl = document.getElementById('new-feature');
+        const paletteGridEl = document.getElementById('palette-grid');
+        const workspaceEl = document.getElementById('workspace');
+        const victoryOverlay = document.getElementById('victory-overlay');
+        const victoryTitle = document.getElementById('victory-title');
+        const victoryEmoji = document.getElementById('victory-emoji');
+        const victoryMessage = document.getElementById('victory-message');
+        const victoryStats = document.getElementById('victory-stats');
+        const btnVictory = document.getElementById('btn-victory');
+
+        const arrows = ['в–І', 'в–¶', 'в–ј', ''];
+        const dirNames = { up: 'РІРІРµСЂС…', down: 'РІРЅРёР·', left: 'РІР»РµРІРѕ', right: 'РІРїСЂР°РІРѕ' };
+        const dirArrows = { up: 'в¬†пёЏ', down: 'в¬‡пёЏ', left: 'в¬…пёЏ', right: 'вћЎпёЏ' };
+        const dirClass = { up: 'block-up', down: 'block-down', left: 'block-left', right: 'block-right' };
+
+        function log(msg, type = 'info') {
+            const p = document.createElement('div');
+            p.className = `log-${type}`;
+            p.textContent = `> ${msg}`;
+            consoleEl.appendChild(p);
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+        }
+
+        function showVictory() {
+            victoryShown = true;
+            const isLastLevel = currentLevel >= levels.length - 1;
+            
+            if (isLastLevel) {
+                victoryTitle.textContent = 'рџЏ† Р’РЎР• РЈР РћР’РќР РџР РћР™Р”Р•РќР«! рџЏ†';
+                victoryEmoji.textContent = 'рџЋѓрџ‘»рџЋѓ';
+                victoryMessage.innerHTML = `РўС‹ РЅР°СЃС‚РѕСЏС‰РёР№ РјР°СЃС‚РµСЂ РҐСЌР»Р»РѕСѓРёРЅР°!<br>РўС‹РєРІР° РїСЂРѕС€Р»Р° РІСЃРµ РёСЃРїС‹С‚Р°РЅРёСЏ!`;
+                btnVictory.textContent = ' РќР°С‡Р°С‚СЊ СЃРЅР°С‡Р°Р»Р°';
+                btnVictory.onclick = () => { currentLevel = 0; closeVictory(); };
+            } else {
+                victoryTitle.textContent = 'рџЋ‰ РЈР РћР’Р•РќР¬ РџР РћР™Р”Р•Рќ! рџЋ‰';
+                victoryEmoji.textContent = 'рџЋѓрџЌ¬рџЋѓ';
+                victoryMessage.innerHTML = `РћС‚Р»РёС‡РЅРѕ! РўС‹РєРІР° СЃРѕР±СЂР°Р»Р° РІСЃРµ РєРѕРЅС„РµС‚С‹<br>Рё РґРѕР±СЂР°Р»Р°СЃСЊ РґРѕ РІС‹С…РѕРґР°!`;
+                btnVictory.textContent = ' РЎР»РµРґСѓСЋС‰РёР№ СѓСЂРѕРІРµРЅСЊ';
+                btnVictory.onclick = () => { currentLevel++; closeVictory(); };
+            }
+            
+            victoryStats.innerHTML = `
+                РЈСЂРѕРІРµРЅСЊ: ${currentLevel + 1} РёР· ${levels.length}<br>
+                РЎРѕР±СЂР°РЅРѕ РєРѕРЅС„РµС‚: ${candiesCollected} РёР· ${totalCandies} рџЌ¬<br>
+                Р‘Р»РѕРєРѕРІ РІ РїСЂРѕРіСЂР°РјРјРµ: ${program.length}
+            `;
+            
+            victoryOverlay.style.display = 'flex';
+            createFallingCandies();
+        }
+
+        function closeVictory() {
+            victoryOverlay.style.display = 'none';
+            victoryShown = false;
+            program = [];
+            initLevel();
+        }
+
+        function createFallingCandies() {
+            const emojis = ['рџЌ¬', 'рџЌ­', 'рџ‘»', 'пёЏ', 'рџЋѓ', 'рџ¦‡'];
+            for (let i = 0; i < 25; i++) {
+                setTimeout(() => {
+                    const candy = document.createElement('div');
+                    candy.className = 'falling-candy';
+                    candy.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                    candy.style.left = Math.random() * 100 + 'vw';
+                    candy.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                    document.body.appendChild(candy);
+                    setTimeout(() => candy.remove(), 5500);
+                }, i * 100);
+            }
+        }
+
+        function initLevel() {
+            const level = levels[currentLevel];
+            mapData = level.map.map(row => [...row]);
+            levelInfoEl.textContent = level.name;
+            hintEl.textContent = level.hint;
+            candiesCollected = 0;
+            totalCandies = 0;
+            victoryShown = false;
+            program = [];
+            consoleEl.innerHTML = '';
+            
+            const feat = level.features;
+            if (feat.wall && currentLevel === levels.findIndex(l => l.features.wall)) {
+                newFeatureEl.style.display = 'block';
+                newFeatureEl.textContent = 'вњЁ РќРѕРІРёРЅРєР°: Р±Р»РѕРєРё В«РґРѕ СЃС‚РµРЅС‹В»!';
+            } else if (feat.input && currentLevel === levels.findIndex(l => l.features.input)) {
+                newFeatureEl.style.display = 'block';
+                newFeatureEl.textContent = 'вњЁ РќРѕРІРёРЅРєР°: Р±Р»РѕРєРё СЃ РѕРєРѕС€РєРѕРј РґР»СЏ С‡РёСЃР»Р°!';
+            } else {
+                newFeatureEl.style.display = 'none';
+            }
+            
+            log(`рџЋѓ РќР°С‡Р°Р»Рѕ СѓСЂРѕРІРЅСЏ! РЎРѕР±РµСЂРё РІСЃРµ рџЌ¬ Рё РґРѕР№РґРё РґРѕ `, 'info');
+
+            for (let y = 0; y < mapData.length; y++) {
+                for (let x = 0; x < mapData[y].length; x++) {
+                    if (mapData[y][x] === 4) {
+                        player.x = x;
+                        player.y = y;
+                        player.dir = level.startDir;
+                        mapData[y][x] = 0;
+                    }
+                    if (mapData[y][x] === 2) totalCandies++;
+                }
+            }
+            renderGrid();
+            renderPalette();
+            renderProgram();
+        }
+
+        function renderGrid() {
+            gridEl.innerHTML = '';
+            gridEl.style.gridTemplateColumns = `repeat(${mapData[0].length}, 55px)`;
+
+            for (let y = 0; y < mapData.length; y++) {
+                for (let x = 0; x < mapData[y].length; x++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    
+                    const val = mapData[y][x];
+                    if (val === 1) {
+                        cell.classList.add('wall');
+                        cell.textContent = 'рџЄ¦';
+                    } else if (val === 2) {
+                        cell.textContent = 'рџЌ¬';
+                    } else if (val === 3) {
+                        cell.textContent = 'рџљЄ';
+                    }
+
+                    if (x === player.x && y === player.y) {
+                        cell.textContent = 'рџЋѓ';
+                        cell.classList.add('player');
+                        
+                        const indicator = document.createElement('div');
+                        indicator.className = `direction-indicator dir-${['up','right','down','left'][player.dir]}`;
+                        indicator.textContent = arrows[player.dir];
+                        cell.appendChild(indicator);
+                    }
+                    gridEl.appendChild(cell);
+                }
+            }
+        }
+
+        function renderPalette() {
+            paletteGridEl.innerHTML = '';
+            const feat = levels[currentLevel].features;
+            
+            if (feat.base) {
+                ['up', 'down', 'left', 'right'].forEach(dir => {
+                    paletteGridEl.appendChild(createBaseBlock(dir));
+                });
+            }
+            
+            if (feat.input) {
+                ['up', 'down', 'left', 'right'].forEach(dir => {
+                    paletteGridEl.appendChild(createInputBlock(dir));
+                });
+            }
+            
+            if (feat.wall) {
+                ['up', 'down', 'left', 'right'].forEach(dir => {
+                    paletteGridEl.appendChild(createWallBlock(dir));
+                });
+            }
+        }
+
+        function createBaseBlock(dir) {
+            const block = document.createElement('div');
+            block.className = `puzzle-block ${dirClass[dir]}`;
+            block.innerHTML = `
+                <div class="icon">${dirArrows[dir]}</div>
+                <div class="label">${dirNames[dir]} С€Р°Рі</div>
+            `;
+            block.onclick = () => {
+                if (isRunning) return;
+                addToProgram(dir, 1);
+            };
+            return block;
+        }
+
+        function createInputBlock(dir) {
+            const block = document.createElement('div');
+            block.className = `puzzle-block-input ${dirClass[dir]}`;
+            
+            block.innerHTML = `
+                <div class="icon">${dirArrows[dir]}</div>
+                <div class="label-row">
+                    <span class="label-text">${dirNames[dir]} Г—</span>
+                    <div class="count-controls">
+                        <button class="count-btn" type="button" data-action="dec">в€’</button>
+                        <input type="number" class="count-input" value="2" min="1" max="9" data-dir="${dir}">
+                        <button class="count-btn" type="button" data-action="inc">+</button>
+                    </div>
+                </div>
+            `;
+            
+            const input = block.querySelector('.count-input');
+            const decBtn = block.querySelector('[data-action="dec"]');
+            const incBtn = block.querySelector('[data-action="inc"]');
+            
+            decBtn.onclick = (e) => {
+                e.stopPropagation();
+                let val = parseInt(input.value) || 1;
+                if (val > 1) input.value = val - 1;
+            };
+            
+            incBtn.onclick = (e) => {
+                e.stopPropagation();
+                let val = parseInt(input.value) || 1;
+                if (val < 9) input.value = val + 1;
+            };
+            
+            block.onclick = (e) => {
+                if (isRunning) return;
+                if (e.target.classList.contains('count-input') || 
+                    e.target.classList.contains('count-btn')) return;
+                
+                let count = parseInt(input.value);
+                if (isNaN(count) || count < 1) count = 1;
+                if (count > 9) count = 9;
+                addToProgram(dir, count);
+            };
+            
+            input.onclick = (e) => e.stopPropagation();
+            input.oninput = () => {
+                let val = parseInt(input.value);
+                if (isNaN(val) || val < 1) input.value = 1;
+                if (val > 9) input.value = 9;
+            };
+            
+            return block;
+        }
+
+        function createWallBlock(dir) {
+            const block = document.createElement('div');
+            block.className = `puzzle-block ${dirClass[dir]}`;
+            block.innerHTML = `
+                <div class="icon">${dirArrows[dir]}</div>
+                <div class="label">${dirNames[dir]} РґРѕ СЃС‚РµРЅС‹</div>
+            `;
+            block.onclick = () => {
+                if (isRunning) return;
+                addToProgram(dir, 'wall');
+            };
+            return block;
+        }
+
+        function addToProgram(dir, count) {
+            program.push({
+                id: ++blockIdCounter,
+                dir: dir,
+                count: count
+            });
+            renderProgram();
+            let desc = '';
+            if (count === 'wall') desc = `${dirNames[dir]} РґРѕ СЃС‚РµРЅС‹`;
+            else if (count > 1) desc = `${dirNames[dir]} Г—${count}`;
+            else desc = `${dirNames[dir]} С€Р°Рі`;
+            log(`вћ• Р”РѕР±Р°РІР»РµРЅ Р±Р»РѕРє: ${desc}`, 'info');
+        }
+
+        function removeFromProgram(id) {
+            program = program.filter(b => b.id !== id);
+            renderProgram();
+        }
+
+        function moveBlockInProgram(id, direction) {
+            const idx = program.findIndex(b => b.id === id);
+            if (idx === -1) return;
+            const newIdx = idx + direction;
+            if (newIdx < 0 || newIdx >= program.length) return;
+            [program[idx], program[newIdx]] = [program[newIdx], program[idx]];
+            renderProgram();
+        }
+
+        function clearProgram() {
+            if (isRunning) return;
+            program = [];
+            renderProgram();
+            log('рџ—‘ РџСЂРѕРіСЂР°РјРјР° РѕС‡РёС‰РµРЅР°', 'info');
+        }
+
+        function renderProgram() {
+            workspaceEl.innerHTML = '';
+            
+            if (program.length === 0) {
+                const empty = document.createElement('div');
+                empty.id = 'workspace-empty';
+                empty.innerHTML = 'РќР°Р¶РјРё РЅР° Р±Р»РѕРє СЃР»РµРІР°,<br>С‡С‚РѕР±С‹ РґРѕР±Р°РІРёС‚СЊ РµРіРѕ СЃСЋРґР° рџ‘€';
+                workspaceEl.appendChild(empty);
+                return;
+            }
+            
+            program.forEach((block) => {
+                const el = document.createElement('div');
+                el.className = `program-block ${dirClass[block.dir]}`;
+                el.dataset.id = block.id;
+                
+                let countText = '';
+                if (block.count === 'wall') {
+                    countText = 'рџ§± РґРѕ СЃС‚РµРЅС‹';
+                } else if (block.count > 1) {
+                    countText = `Г—${block.count}`;
+                }
+                
+                el.innerHTML = `
+                    <div class="block-content">
+                        <span class="block-icon">${dirArrows[block.dir]}</span>
+                        <span>${dirNames[block.dir]} ${countText}</span>
+                    </div>
+                    <div class="block-controls">
+                        <button class="block-btn" onclick="moveBlockInProgram(${block.id}, -1)" title="Р’С‹С€Рµ">в†‘</button>
+                        <button class="block-btn" onclick="moveBlockInProgram(${block.id}, 1)" title="РќРёР¶Рµ">в†“</button>
+                        <button class="block-btn delete" onclick="removeFromProgram(${block.id})" title="РЈРґР°Р»РёС‚СЊ">вњ•</button>
+                    </div>
+                `;
+                workspaceEl.appendChild(el);
+            });
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function canMove(x, y) {
+            if (y < 0 || y >= mapData.length || x < 0 || x >= mapData[0].length) return false;
+            if (mapData[y][x] === 1) return false;
+            return true;
+        }
+
+        function moveOneStep(dir) {
+            let dx = 0, dy = 0;
+            if (dir === 'up') { player.dir = 0; dy = -1; }
+            else if (dir === 'down') { player.dir = 2; dy = 1; }
+            else if (dir === 'left') { player.dir = 3; dx = -1; }
+            else if (dir === 'right') { player.dir = 1; dx = 1; }
+
+            const newX = player.x + dx;
+            const newY = player.y + dy;
+
+            if (!canMove(newX, newY)) return false;
+
+            player.x = newX;
+            player.y = newY;
+
+            if (mapData[newY][newX] === 2) {
+                mapData[newY][newX] = 0;
+                candiesCollected++;
+                log(`рџЌ¬ РљРѕРЅС„РµС‚Р° СЃРѕР±СЂР°РЅР°! (${candiesCollected}/${totalCandies})`, 'success');
+            }
+            return true;
+        }
+
+        function checkVictory() {
+            if (mapData[player.y][player.x] === 3 && candiesCollected === totalCandies && !victoryShown) {
+                log(` РЈСЂРѕРІРµРЅСЊ РїСЂРѕР№РґРµРЅ! Р’СЃРµ РєРѕРЅС„РµС‚С‹ СЃРѕР±СЂР°РЅС‹!`, 'success');
+                setTimeout(() => showVictory(), 500);
+                return true;
+            }
+            return false;
+        }
+
+        function highlightBlock(id) {
+            document.querySelectorAll('.program-block').forEach(el => el.classList.remove('active'));
+            const el = document.querySelector(`.program-block[data-id="${id}"]`);
+            if (el) {
+                el.classList.add('active');
+                el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        async function runProgram() {
+            if (isRunning) return;
+            if (program.length === 0) {
+                log('вљ пёЏ РџСЂРѕРіСЂР°РјРјР° РїСѓСЃС‚Р°! Р”РѕР±Р°РІСЊ Р±Р»РѕРєРё.', 'error');
+                return;
+            }
+            
+            resetPlayerPosition();
+            
+            isRunning = true;
+            log(`в–¶ Р—Р°РїСѓСЃРє РїСЂРѕРіСЂР°РјРјС‹ (${program.length} Р±Р»РѕРєРѕРІ)...`, 'info');
+
+            for (let block of program) {
+                if (!isRunning) break;
+                highlightBlock(block.id);
+                
+                const dir = block.dir;
+                
+                if (block.count === 'wall') {
+                    log(`рџЏѓ ${dirNames[dir]} РґРѕ СЃС‚РµРЅС‹...`, 'info');
+                    let steps = 0;
+                    while (isRunning) {
+                        const moved = moveOneStep(dir);
+                        renderGrid();
+                        await sleep(180);
+                        if (!moved) break;
+                        steps++;
+                        if (checkVictory()) { isRunning = false; return; }
+                    }
+                    log(`вњ“ РџСЂРѕС€Р»Рё ${steps} С€Р°РіРѕРІ РґРѕ СЃС‚РµРЅС‹`, 'info');
+                } else {
+                    const count = block.count;
+                    log(`рџљ¶ ${dirNames[dir]} Г—${count}...`, 'info');
+                    for (let i = 0; i < count; i++) {
+                        if (!isRunning) break;
+                        const moved = moveOneStep(dir);
+                        renderGrid();
+                        await sleep(280);
+                        if (!moved) {
+                            log(` РЈРїС‘СЂР»РёСЃСЊ РІ СЃС‚РµРЅСѓ РЅР° С€Р°РіРµ ${i + 1}!`, 'error');
+                            isRunning = false;
+                            return;
+                        }
+                        if (checkVictory()) { isRunning = false; return; }
+                    }
+                }
+            }
+            
+            document.querySelectorAll('.program-block').forEach(el => el.classList.remove('active'));
+            
+            if (isRunning) {
+                if (candiesCollected < totalCandies) {
+                    log(`вљ пёЏ РќРµ РІСЃРµ РєРѕРЅС„РµС‚С‹ СЃРѕР±СЂР°РЅС‹! (${candiesCollected}/${totalCandies})`, 'error');
+                } else if (mapData[player.y][player.x] !== 3) {
+                    log(`вљ пёЏ РўС‹РєРІР° РЅРµ РґРѕС€Р»Р° РґРѕ РІС‹С…РѕРґР° рџљЄ`, 'error');
+                }
+            }
+            isRunning = false;
+        }
+
+        function resetPlayerPosition() {
+            const level = levels[currentLevel];
+            mapData = level.map.map(row => [...row]);
+            candiesCollected = 0;
+            for (let y = 0; y < mapData.length; y++) {
+                for (let x = 0; x < mapData[y].length; x++) {
+                    if (mapData[y][x] === 4) {
+                        player.x = x;
+                        player.y = y;
+                        player.dir = level.startDir;
+                        mapData[y][x] = 0;
+                    }
+                }
+            }
+            renderGrid();
+        }
+
+        function resetLevel() {
+            isRunning = false;
+            victoryShown = false;
+            victoryOverlay.style.display = 'none';
+            program = [];
+            initLevel();
+        }
+
+        initLevel();
+    </script>
+</body>
+</html>

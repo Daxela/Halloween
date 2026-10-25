@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> РҐСЌР»Р»РѕСѓРёРЅ: РџСѓС‚СЊ РўС‹РєРІС‹ рџ‘»</title>
+    <style>
+        body {
+            background-color: #1a0b2e;
+            color: #ff9800;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            background-image: radial-gradient(circle at top, #2d1b4e 0%, #1a0b2e 100%);
+        }
+        h1 { text-shadow: 0 0 10px #ff5722; margin-bottom: 5px; }
+        #level-info { font-size: 1.2em; color: #ba68c8; margin-bottom: 15px; }
+        
+        #game-container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        #grid {
+            display: grid;
+            gap: 2px;
+            background-color: #4a148c;
+            padding: 5px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px #9c27b0;
+        }
+        .cell {
+            width: 60px;
+            height: 60px;
+            background-color: #2a0a4a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            position: relative;
+        }
+        .wall { background-color: #111; box-shadow: inset 0 0 10px #000; }
+        .player { transition: all 0.3s ease; }
+        
+        .direction-indicator {
+            position: absolute;
+            font-size: 14px;
+            color: #ffeb3b;
+            opacity: 0.9;
+            text-shadow: 0 0 4px #ffeb3b;
+            pointer-events: none;
+        }
+        .dir-up    { top: 2px; left: 50%; transform: translateX(-50%); }
+        .dir-right { right: 2px; top: 50%; transform: translateY(-50%); }
+        .dir-down  { bottom: 2px; left: 50%; transform: translateX(-50%); }
+        .dir-left  { left: 2px; top: 50%; transform: translateY(-50%); }
+
+        #controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 300px;
+        }
+        textarea {
+            height: 150px;
+            background-color: #0d0514;
+            color: #00ff00;
+            border: 2px solid #4a148c;
+            border-radius: 5px;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            resize: vertical;
+        }
+        button {
+            padding: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            transition: 0.2s;
+        }
+        .btn-run { background-color: #ff9800; color: #000; }
+        .btn-run:hover { background-color: #ffb74d; }
+        .btn-reset { background-color: #9c27b0; color: #fff; }
+        .btn-reset:hover { background-color: #ba68c8; }
+
+        #console {
+            margin-top: 20px;
+            width: 100%;
+            max-width: 600px;
+            height: 120px;
+            background-color: #000;
+            border: 2px solid #ff5722;
+            border-radius: 5px;
+            padding: 10px;
+            overflow-y: auto;
+            font-size: 14px;
+            color: #ccc;
+        }
+        .log-success { color: #4caf50; }
+        .log-error { color: #f44336; }
+        .log-info { color: #ff9800; }
+        .log-hint { color: #00bcd4; }
+        
+        .legend { font-size: 14px; color: #aaa; margin-top: 10px; text-align: center;}
+        
+        .new-feature {
+            background: linear-gradient(45deg, #ff6f00, #ff9800);
+            color: #000;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 10px;
+            display: none;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* РњРћР”РђР›Р¬РќРћР• РћРљРќРћ РџРћР—Р”Р РђР’Р›Р•РќРРЇ */
+        #victory-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        #victory-modal {
+            background: linear-gradient(135deg, #2d1b4e 0%, #4a148c 50%, #2d1b4e 100%);
+            border: 4px solid #ff9800;
+            border-radius: 20px;
+            padding: 40px 60px;
+            text-align: center;
+            box-shadow: 
+                0 0 40px #ff9800,
+                0 0 80px #ff5722,
+                inset 0 0 30px rgba(255, 152, 0, 0.3);
+            animation: modalAppear 0.6s ease-out;
+            max-width: 500px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes modalAppear {
+            0% {
+                transform: scale(0.3) rotate(-10deg);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.1) rotate(3deg);
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+
+        #victory-modal::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(
+                from 0deg,
+                transparent,
+                rgba(255, 152, 0, 0.1),
+                transparent,
+                rgba(255, 87, 34, 0.1),
+                transparent
+            );
+            animation: rotate 4s linear infinite;
+        }
+
+        @keyframes rotate {
+            100% { transform: rotate(360deg); }
+        }
+
+        .victory-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .victory-title {
+            font-size: 48px;
+            margin: 0 0 20px 0;
+            color: #ff9800;
+            text-shadow: 
+                0 0 10px #ff5722,
+                0 0 20px #ff5722,
+                0 0 30px #ff5722;
+            animation: titleBounce 1s ease-in-out infinite;
+        }
+
+        @keyframes titleBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .victory-emoji {
+            font-size: 64px;
+            margin: 20px 0;
+            animation: emojiSpin 2s ease-in-out infinite;
+        }
+
+        @keyframes emojiSpin {
+            0%, 100% { transform: rotate(-5deg) scale(1); }
+            50% { transform: rotate(5deg) scale(1.1); }
+        }
+
+        .victory-message {
+            font-size: 20px;
+            color: #fff;
+            margin: 20px 0;
+            line-height: 1.5;
+        }
+
+        .victory-stats {
+            font-size: 16px;
+            color: #ba68c8;
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+
+        .btn-victory {
+            background: linear-gradient(45deg, #ff9800, #ff5722);
+            color: #000;
+            font-size: 20px;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(255, 152, 0, 0.5);
+        }
+
+        .btn-victory:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 152, 0, 0.7);
+        }
+
+        .btn-victory:active {
+            transform: translateY(0);
+        }
+
+        /* РџР°РґР°СЋС‰РёРµ РєРѕРЅС„РµС‚С‹ */
+        .falling-candy {
+            position: fixed;
+            font-size: 30px;
+            top: -50px;
+            animation: fall linear forwards;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(110vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>рџЋѓ РҐСЌР»Р»РѕСѓРёРЅ: РџСѓС‚СЊ РўС‹РєРІС‹ </h1>
+    <div id="level-info">РЈСЂРѕРІРµРЅСЊ 1: Р—Р°Р±СЂРѕС€РµРЅРЅРѕРµ РєР»Р°РґР±РёС‰Рµ</div>
+
+    <div id="game-container">
+        <div id="grid"></div>
+        <div id="controls">
+            <div class="new-feature" id="new-feature"></div>
+            <textarea id="commands" placeholder="Р’РІРµРґРёС‚Рµ РєРѕРјР°РЅРґС‹ (РєР°Р¶РґР°СЏ СЃ РЅРѕРІРѕР№ СЃС‚СЂРѕРєРё):&#10;РІРїСЂР°РІРѕ&#10;РІРЅРёР·&#10;РІР»РµРІРѕ&#10;РІРІРµСЂС…"></textarea>
+            <button class="btn-run" onclick="runCommands()">в–¶ Р—Р°РїСѓСЃС‚РёС‚СЊ (РљРѕР»РґРѕРІР°С‚СЊ)</button>
+            <button class="btn-reset" onclick="resetLevel()">рџ”„ РЎР±СЂРѕСЃ СѓСЂРѕРІРЅСЏ</button>
+            <div class="legend" id="legend">
+                рџЋѓ - Р’С‹ (РўС‹РєРІР°) | рџЌ¬ - РљРѕРЅС„РµС‚Р° | рџљЄ - Р’С‹С…РѕРґ | рџЄ¦ - РЎС‚РµРЅР°<br>
+                Р–С‘Р»С‚Р°СЏ СЃС‚СЂРµР»РєР° РїРѕРєР°Р·С‹РІР°РµС‚ РЅР°РїСЂР°РІР»РµРЅРёРµ РґРІРёР¶РµРЅРёСЏ<br>
+                РљРѕРјР°РЅРґС‹: <b>РІРІРµСЂС…, РІРЅРёР·, РІР»РµРІРѕ, РІРїСЂР°РІРѕ</b>
+            </div>
+        </div>
+    </div>
+
+    <div id="console"></div>
+
+    <!-- РњРѕРґР°Р»СЊРЅРѕРµ РѕРєРЅРѕ РїРѕР·РґСЂР°РІР»РµРЅРёСЏ -->
+    <div id="victory-overlay">
+        <div id="victory-modal">
+            <div class="victory-content">
+                <div class="victory-title" id="victory-title">рџЋ‰ РЈР РћР’Р•РќР¬ РџР РћР™Р”Р•Рќ! рџЋ‰</div>
+                <div class="victory-emoji" id="victory-emoji">рџЋѓрџЌ¬рџЋѓ</div>
+                <div class="victory-message" id="victory-message">
+                    РўС‹РєРІР° СѓСЃРїРµС€РЅРѕ РґРѕР±СЂР°Р»Р°СЃСЊ РґРѕ РІС‹С…РѕРґР°!
+                </div>
+                <div class="victory-stats" id="victory-stats"></div>
+                <button class="btn-victory" id="btn-victory" onclick="closeVictory()">
+                    вћЎ РЎР»РµРґСѓСЋС‰РёР№ СѓСЂРѕРІРµРЅСЊ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const levels = [
+            {
+                name: "РЈСЂРѕРІРµРЅСЊ 1: РўС‹РєРІРµРЅРЅС‹Р№ РїРµСЂРµСѓР»РѕРє (4Г—4) вЂ” 1 РєРѕРЅС„РµС‚Р°",
+                map: [
+                    [4, 0, 0, 0],
+                    [1, 1, 0, 1],
+                    [0, 2, 0, 0],
+                    [0, 1, 0, 3]
+                ],
+                startDir: 2
+            },
+            {
+                name: "РЈСЂРѕРІРµРЅСЊ 2: Р—Р°Р±СЂРѕС€РµРЅРЅРѕРµ РєР»Р°РґР±РёС‰Рµ (5Г—5) вЂ” 2 РєРѕРЅС„РµС‚С‹",
+                map: [
+                    [4, 0, 0, 0, 0],
+                    [1, 1, 0, 1, 0],
+                    [0, 0, 0, 1, 2],
+                    [0, 1, 2, 0, 0],
+                    [0, 0, 0, 0, 3]
+                ],
+                startDir: 2
+            },
+            {
+                name: "РЈСЂРѕРІРµРЅСЊ 3: Р”РѕРј СЃ РїСЂРёРІРёРґРµРЅРёСЏРјРё (6Г—6) вЂ” 3 РєРѕРЅС„РµС‚С‹",
+                map: [
+                    [4, 0, 1, 0, 0, 0],
+                    [0, 0, 1, 0, 1, 0],
+                    [0, 2, 0, 0, 1, 0],
+                    [1, 1, 1, 0, 0, 2],
+                    [0, 0, 0, 0, 1, 0],
+                    [0, 1, 2, 0, 0, 3]
+                ],
+                startDir: 2
+            },
+            {
+                name: "РЈСЂРѕРІРµРЅСЊ 4: Р›РµСЃРЅР°СЏ С‚СЂРѕРїР° (7Г—5) вЂ” 3 РєРѕРЅС„РµС‚С‹",
+                map: [
+                    [4, 0, 0, 0, 0, 0, 0],
+                    [0, 1, 0, 1, 1, 0, 1],
+                    [2, 0, 0, 0, 0, 0, 2],
+                    [1, 1, 1, 1, 0, 1, 0],
+                    [0, 0, 2, 0, 0, 0, 3]
+                ],
+                startDir: 2
+            },
+            {
+                name: "РЈСЂРѕРІРµРЅСЊ 5: Р—Р°РјРѕРє Р”СЂР°РєСѓР»С‹ (8Г—8) вЂ” 5 РєРѕРЅС„РµС‚",
+                map: [
+                    [4, 0, 1, 0, 0, 0, 1, 0],
+                    [0, 0, 1, 0, 1, 0, 1, 0],
+                    [0, 2, 0, 0, 1, 0, 0, 2],
+                    [1, 1, 1, 0, 1, 1, 1, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 1, 1, 1, 1, 0, 1, 2],
+                    [2, 0, 0, 0, 0, 0, 1, 0],
+                    [1, 0, 1, 0, 1, 0, 0, 3]
+                ],
+                startDir: 2
+            },
+            {
+                name: "РЈСЂРѕРІРµРЅСЊ 6: РџРѕРґР·РµРјРµР»СЊРµ РІР°РјРїРёСЂРѕРІ (9Г—9) вЂ” 4 РєРѕРЅС„РµС‚С‹",
+                map: [
+                    [4, 0, 0, 0, 1, 0, 0, 0, 0],
+                    [1, 1, 0, 0, 1, 0, 1, 1, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 1, 0],
+                    [0, 1, 1, 1, 0, 1, 0, 0, 2],
+                    [0, 0, 0, 1, 0, 1, 0, 1, 0],
+                    [2, 1, 0, 0, 0, 0, 0, 1, 0],
+                    [0, 1, 0, 1, 1, 1, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 1, 2, 1, 0],
+                    [1, 0, 1, 0, 0, 0, 0, 0, 3]
+                ],
+                startDir: 2
+            },
+            {
+                name: "РЈСЂРѕРІРµРЅСЊ 7: Р›РѕРіРѕРІРѕ Р¤СЂР°РЅРєРµРЅС€С‚РµР№РЅР° (10Г—10) вЂ” 6 РєРѕРЅС„РµС‚",
+                map: [
+                    [4, 0, 0, 1, 0, 0, 0, 1, 0, 0],
+                    [0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+                    [0, 1, 0, 0, 0, 1, 0, 0, 0, 0],
+                    [0, 0, 0, 1, 0, 0, 0, 1, 1, 0],
+                    [1, 1, 0, 1, 0, 1, 0, 0, 0, 2],
+                    [0, 0, 0, 0, 0, 1, 1, 1, 0, 0],
+                    [0, 1, 1, 1, 0, 0, 0, 0, 0, 1],
+                    [2, 0, 0, 1, 0, 1, 0, 1, 0, 0],
+                    [0, 1, 0, 0, 0, 1, 0, 1, 2, 0],
+                    [0, 0, 0, 1, 2, 0, 0, 0, 0, 3]
+                ],
+                startDir: 2
+            }
+        ];
+
+        let currentLevel = 0;
+        let player = { x: 0, y: 0, dir: 0 };
+        let mapData = [];
+        let candiesCollected = 0;
+        let totalCandies = 0;
+        let isRunning = false;
+        let victoryShown = false;
+
+        const gridEl = document.getElementById('grid');
+        const consoleEl = document.getElementById('console');
+        const levelInfoEl = document.getElementById('level-info');
+        const newFeatureEl = document.getElementById('new-feature');
+        const commandsEl = document.getElementById('commands');
+        const legendEl = document.getElementById('legend');
+        const victoryOverlay = document.getElementById('victory-overlay');
+        const victoryTitle = document.getElementById('victory-title');
+        const victoryEmoji = document.getElementById('victory-emoji');
+        const victoryMessage = document.getElementById('victory-message');
+        const victoryStats = document.getElementById('victory-stats');
+        const btnVictory = document.getElementById('btn-victory');
+
+        const arrows = ['в–І', 'в–¶', 'в–ј', 'в—Ђ'];
+
+        function log(msg, type = 'info') {
+            const p = document.createElement('div');
+            p.className = `log-${type}`;
+            p.textContent = `> ${msg}`;
+            consoleEl.appendChild(p);
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+        }
+
+        function showVictory() {
+            victoryShown = true;
+            const isLastLevel = currentLevel >= levels.length - 1;
+            
+            if (isLastLevel) {
+                victoryTitle.textContent = 'рџЏ† Р’Р« РџР РћРЁР›Р Р’РЎР• РЈР РћР’РќР! рџЏ†';
+                victoryEmoji.textContent = 'рџЋѓрџ‘»рџЋѓ';
+                victoryMessage.innerHTML = `
+                    РџРѕР·РґСЂР°РІР»СЏРµРј! Р’С‹ РЅР°СЃС‚РѕСЏС‰РёР№ РјР°СЃС‚РµСЂ РҐСЌР»Р»РѕСѓРёРЅР°!<br>
+                    РўС‹РєРІР° РїСЂРѕС€Р»Р° С‡РµСЂРµР· РІСЃРµ РёСЃРїС‹С‚Р°РЅРёСЏ Рё РЅР°С€Р»Р° РІС‹С…РѕРґ РёР· Р»РѕРіРѕРІР° Р¤СЂР°РЅРєРµРЅС€С‚РµР№РЅР°!
+                `;
+                btnVictory.textContent = 'рџ”„ РќР°С‡Р°С‚СЊ СЃРЅР°С‡Р°Р»Р°';
+                btnVictory.onclick = () => {
+                    currentLevel = 0;
+                    closeVictory();
+                };
+            } else {
+                victoryTitle.textContent = 'рџЋ‰ РЈР РћР’Р•РќР¬ РџР РћР™Р”Р•Рќ! рџЋ‰';
+                victoryEmoji.textContent = 'рџЋѓрџЌ¬рџЋѓ';
+                victoryMessage.innerHTML = `
+                    РћС‚Р»РёС‡РЅРѕ! РўС‹РєРІР° СЃРѕР±СЂР°Р»Р° РІСЃРµ РєРѕРЅС„РµС‚С‹<br>
+                    Рё РґРѕР±СЂР°Р»Р°СЃСЊ РґРѕ РІС‹С…РѕРґР°!
+                `;
+                btnVictory.textContent = 'вћЎ РЎР»РµРґСѓСЋС‰РёР№ СѓСЂРѕРІРµРЅСЊ';
+                btnVictory.onclick = () => {
+                    currentLevel++;
+                    closeVictory();
+                };
+            }
+            
+            victoryStats.innerHTML = `
+                РЈСЂРѕРІРµРЅСЊ: ${currentLevel + 1} РёР· ${levels.length}<br>
+                РЎРѕР±СЂР°РЅРѕ РєРѕРЅС„РµС‚: ${candiesCollected} РёР· ${totalCandies} рџЌ¬
+            `;
+            
+            victoryOverlay.style.display = 'flex';
+            createFallingCandies();
+        }
+
+        function closeVictory() {
+            victoryOverlay.style.display = 'none';
+            victoryShown = false;
+            initLevel();
+        }
+
+        function createFallingCandies() {
+            const emojis = ['рџЌ¬', '', 'рџ‘»', '', 'рџ•·пёЏ', 'рџЌ­'];
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const candy = document.createElement('div');
+                    candy.className = 'falling-candy';
+                    candy.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                    candy.style.left = Math.random() * 100 + 'vw';
+                    candy.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                    candy.style.animationDelay = Math.random() * 0.5 + 's';
+                    document.body.appendChild(candy);
+                    
+                    setTimeout(() => candy.remove(), 5000);
+                }, i * 100);
+            }
+        }
+
+        function initLevel() {
+            const level = levels[currentLevel];
+            mapData = level.map.map(row => [...row]);
+            levelInfoEl.textContent = level.name;
+            candiesCollected = 0;
+            totalCandies = 0;
+            victoryShown = false;
+            consoleEl.innerHTML = '';
+            
+            if (currentLevel >= 5) {
+                newFeatureEl.style.display = 'block';
+                newFeatureEl.textContent = 'вњЁ РќРѕРІР°СЏ РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ: РїРёС€РёС‚Рµ "РІРїСЂР°РІРѕ *" РґР»СЏ РґРІРёР¶РµРЅРёСЏ РґРѕ СЃС‚РµРЅС‹!';
+                commandsEl.placeholder = "РџСЂРёРјРµСЂС‹ РєРѕРјР°РЅРґ:\nРІРїСЂР°РІРѕ *\nРІРЅРёР· 3\nРІР»РµРІРѕ\nРІРІРµСЂС… *";
+                legendEl.innerHTML = "рџЋѓ - Р’С‹ (РўС‹РєРІР°) | рџЌ¬ - РљРѕРЅС„РµС‚Р° | рџљЄ - Р’С‹С…РѕРґ | рџЄ¦ - РЎС‚РµРЅР°<br>Р–С‘Р»С‚Р°СЏ СЃС‚СЂРµР»РєР° РїРѕРєР°Р·С‹РІР°РµС‚ РЅР°РїСЂР°РІР»РµРЅРёРµ РґРІРёР¶РµРЅРёСЏ<br>РљРѕРјР°РЅРґС‹: <b>РІРІРµСЂС…, РІРЅРёР·, РІР»РµРІРѕ, РІРїСЂР°РІРѕ</b><br><b style='color:#00bcd4'>РќРѕРІРёРЅРєР°: '*' РѕР·РЅР°С‡Р°РµС‚ 'РґРѕ СЃС‚РµРЅС‹'!</b>";
+                log(`вњЁ РќРѕРІС‹Р№ СѓСЂРѕРІРµРЅСЊ! РўРµРїРµСЂСЊ РјРѕР¶РЅРѕ РїРёСЃР°С‚СЊ "РєРѕРјР°РЅРґР° *" РґР»СЏ РґРІРёР¶РµРЅРёСЏ РґРѕ СЃС‚РµРЅС‹!`, 'hint');
+            } else if (currentLevel >= 3) {
+                newFeatureEl.style.display = 'block';
+                newFeatureEl.textContent = 'вњЁ РќРѕРІР°СЏ РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ: РїРёС€РёС‚Рµ "РІРїСЂР°РІРѕ 3" РґР»СЏ РїРѕРІС‚РѕСЂРµРЅРёСЏ!';
+                commandsEl.placeholder = "РџСЂРёРјРµСЂС‹ РєРѕРјР°РЅРґ:\nРІРїСЂР°РІРѕ 3\nРІРЅРёР· 2\nРІР»РµРІРѕ\nРІРІРµСЂС… 4";
+                legendEl.innerHTML = " - Р’С‹ (РўС‹РєРІР°) |  - РљРѕРЅС„РµС‚Р° | рџљЄ - Р’С‹С…РѕРґ | рџЄ¦ - РЎС‚РµРЅР°<br>Р–С‘Р»С‚Р°СЏ СЃС‚СЂРµР»РєР° РїРѕРєР°Р·С‹РІР°РµС‚ РЅР°РїСЂР°РІР»РµРЅРёРµ РґРІРёР¶РµРЅРёСЏ<br>РљРѕРјР°РЅРґС‹: <b>РІРІРµСЂС…, РІРЅРёР·, РІР»РµРІРѕ, РІРїСЂР°РІРѕ</b><br><b style='color:#00bcd4'>РќРѕРІРёРЅРєР°: РјРѕР¶РЅРѕ РїРёСЃР°С‚СЊ 'РІРїСЂР°РІРѕ 3' РґР»СЏ РїРѕРІС‚РѕСЂРµРЅРёСЏ!</b>";
+                log(`вњЁ РќРѕРІС‹Р№ СѓСЂРѕРІРµРЅСЊ! РўРµРїРµСЂСЊ РјРѕР¶РЅРѕ РїРёСЃР°С‚СЊ "РєРѕРјР°РЅРґР° С‡РёСЃР»Рѕ" РґР»СЏ РїРѕРІС‚РѕСЂРµРЅРёСЏ!`, 'hint');
+            } else {
+                newFeatureEl.style.display = 'none';
+                commandsEl.placeholder = "Р’РІРµРґРёС‚Рµ РєРѕРјР°РЅРґС‹ (РєР°Р¶РґР°СЏ СЃ РЅРѕРІРѕР№ СЃС‚СЂРѕРєРё):\nРІРїСЂР°РІРѕ\nРІРЅРёР·\nРІР»РµРІРѕ\nРІРІРµСЂС…";
+                legendEl.innerHTML = "рџЋѓ - Р’С‹ (РўС‹РєРІР°) | рџЌ¬ - РљРѕРЅС„РµС‚Р° | рџљЄ - Р’С‹С…РѕРґ | рџЄ¦ - РЎС‚РµРЅР°<br>Р–С‘Р»С‚Р°СЏ СЃС‚СЂРµР»РєР° РїРѕРєР°Р·С‹РІР°РµС‚ РЅР°РїСЂР°РІР»РµРЅРёРµ РґРІРёР¶РµРЅРёСЏ<br>РљРѕРјР°РЅРґС‹: <b>РІРІРµСЂС…, РІРЅРёР·, РІР»РµРІРѕ, РІРїСЂР°РІРѕ</b>";
+            }
+            
+            log(`РќР°С‡Р°Р»Рѕ СѓСЂРѕРІРЅСЏ. РќР°Р№РґРёС‚Рµ РІСЃРµ рџЌ¬ Рё РґРѕР±РµСЂРёС‚РµСЃСЊ РґРѕ рџљЄ!`, 'info');
+
+            for (let y = 0; y < mapData.length; y++) {
+                for (let x = 0; x < mapData[y].length; x++) {
+                    if (mapData[y][x] === 4) {
+                        player.x = x;
+                        player.y = y;
+                        player.dir = level.startDir;
+                        mapData[y][x] = 0;
+                    }
+                    if (mapData[y][x] === 2) totalCandies++;
+                }
+            }
+            render();
+        }
+
+        function render() {
+            gridEl.innerHTML = '';
+            gridEl.style.gridTemplateColumns = `repeat(${mapData[0].length}, 60px)`;
+
+            for (let y = 0; y < mapData.length; y++) {
+                for (let x = 0; x < mapData[y].length; x++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    
+                    const val = mapData[y][x];
+                    if (val === 1) {
+                        cell.classList.add('wall');
+                        cell.textContent = 'рџЄ¦';
+                    } else if (val === 2) {
+                        cell.textContent = 'рџЌ¬';
+                    } else if (val === 3) {
+                        cell.textContent = 'рџљЄ';
+                    }
+
+                    if (x === player.x && y === player.y) {
+                        cell.textContent = 'рџЋѓ';
+                        cell.classList.add('player');
+                        
+                        const indicator = document.createElement('div');
+                        indicator.className = `direction-indicator dir-${['up','right','down','left'][player.dir]}`;
+                        indicator.textContent = arrows[player.dir];
+                        cell.appendChild(indicator);
+                    }
+                    gridEl.appendChild(cell);
+                }
+            }
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function canMove(x, y) {
+            if (y < 0 || y >= mapData.length || x < 0 || x >= mapData[0].length) return false;
+            if (mapData[y][x] === 1) return false;
+            return true;
+        }
+
+        function moveOneStep(cmd) {
+            let dx = 0, dy = 0;
+            
+            if (cmd === 'РІРІРµСЂС…') {
+                player.dir = 0;
+                dy = -1;
+            } else if (cmd === 'РІРЅРёР·') {
+                player.dir = 2;
+                dy = 1;
+            } else if (cmd === 'РІР»РµРІРѕ') {
+                player.dir = 3;
+                dx = -1;
+            } else if (cmd === 'РІРїСЂР°РІРѕ') {
+                player.dir = 1;
+                dx = 1;
+            } else {
+                return { success: false, error: `РќРµРёР·РІРµСЃС‚РЅР°СЏ РєРѕРјР°РЅРґР°: "${cmd}"` };
+            }
+
+            const newX = player.x + dx;
+            const newY = player.y + dy;
+
+            if (!canMove(newX, newY)) {
+                return { success: false, error: `РќРµР»СЊР·СЏ РґРІРёРіР°С‚СЊСЃСЏ ${cmd} вЂ” СЃС‚РµРЅР° РёР»Рё РіСЂР°РЅРёС†Р°! рџ§±` };
+            }
+
+            player.x = newX;
+            player.y = newY;
+
+            if (mapData[newY][newX] === 2) {
+                mapData[newY][newX] = 0;
+                candiesCollected++;
+                log(`РЎРѕР±СЂР°РЅР° РєРѕРЅС„РµС‚Р°! рџЌ¬ (${candiesCollected}/${totalCandies})`, 'success');
+            }
+
+            return { success: true };
+        }
+
+        function checkVictory() {
+            if (mapData[player.y][player.x] === 3 && candiesCollected === totalCandies && !victoryShown) {
+                log(`рџЋ‰ РЈСЂРѕРІРµРЅСЊ РїСЂРѕР№РґРµРЅ! Р’СЃРµ РєРѕРЅС„РµС‚С‹ СЃРѕР±СЂР°РЅС‹!`, 'success');
+                setTimeout(() => showVictory(), 500);
+                return true;
+            }
+            return false;
+        }
+
+        async function runCommands() {
+            if (isRunning) return;
+            
+            initLevel();
+            
+            isRunning = true;
+            const text = document.getElementById('commands').value;
+            const commands = text.split('\n').map(c => c.trim().toLowerCase()).filter(c => c);
+
+            for (let cmdLine of commands) {
+                if (!isRunning) break;
+                
+                const parts = cmdLine.split(/\s+/);
+                const cmd = parts[0];
+                const modifier = parts.length > 1 ? parts[1] : null;
+                
+                if (!['РІРІРµСЂС…', 'РІРЅРёР·', 'РІР»РµРІРѕ', 'РІРїСЂР°РІРѕ'].includes(cmd)) {
+                    log(`РќРµРёР·РІРµСЃС‚РЅР°СЏ РєРѕРјР°РЅРґР°: "${cmd}"`, 'error');
+                    isRunning = false;
+                    return;
+                }
+                
+                if (modifier === '*') {
+                    log(`Р”РІРёР¶РµРЅРёРµ "${cmd}" РґРѕ СЃС‚РµРЅС‹...`, 'info');
+                    let steps = 0;
+                    while (true) {
+                        if (!isRunning) break;
+                        const result = moveOneStep(cmd);
+                        render();
+                        await sleep(200);
+                        
+                        if (!result.success) {
+                            break;
+                        }
+                        steps++;
+                        
+                        if (checkVictory()) {
+                            isRunning = false;
+                            return;
+                        }
+                    }
+                    log(`РћСЃС‚Р°РЅРѕРІРёР»РёСЃСЊ РїРѕСЃР»Рµ ${steps} С€Р°РіРѕРІ`, 'info');
+                } else if (modifier !== null) {
+                    const count = parseInt(modifier);
+                    if (isNaN(count) || count < 1 || count > 20) {
+                        log(`РќРµРІРµСЂРЅРѕРµ С‡РёСЃР»Рѕ РїРѕРІС‚РѕСЂРµРЅРёР№: "${modifier}" (РґРѕРїСѓСЃС‚РёРјРѕ 1-20 РёР»Рё *)`, 'error');
+                        isRunning = false;
+                        return;
+                    }
+                    
+                    log(`Р”РІРёР¶РµРЅРёРµ "${cmd}" Г— ${count}...`, 'info');
+                    for (let i = 0; i < count; i++) {
+                        if (!isRunning) break;
+                        const result = moveOneStep(cmd);
+                        render();
+                        await sleep(300);
+                        
+                        if (!result.success) {
+                            log(result.error, 'error');
+                            isRunning = false;
+                            return;
+                        }
+                        
+                        if (checkVictory()) {
+                            isRunning = false;
+                            return;
+                        }
+                    }
+                } else {
+                    const result = moveOneStep(cmd);
+                    render();
+                    await sleep(300);
+                    
+                    if (!result.success) {
+                        log(result.error, 'error');
+                        isRunning = false;
+                        return;
+                    }
+                    
+                    if (checkVictory()) {
+                        isRunning = false;
+                        return;
+                    }
+                }
+            }
+            isRunning = false;
+        }
+
+        function resetLevel() {
+            isRunning = false;
+            victoryShown = false;
+            victoryOverlay.style.display = 'none';
+            initLevel();
+        }
+
+        initLevel();
+    </script>
+</body>
+</html>

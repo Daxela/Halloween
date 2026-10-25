@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎃 Хэллоуин: Путь Тыквы - Выбор уровня</title>
+    <style>
+        body {
+            background-color: #1a0b2e;
+            color: #ff9800;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            background-image: 
+                radial-gradient(circle at 20% 50%, #2d1b4e 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, #4a148c 0%, transparent 50%),
+                linear-gradient(180deg, #1a0b2e 0%, #0d0514 100%);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Паутина на фоне */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 50px, rgba(255, 152, 0, 0.03) 50px, rgba(255, 152, 0, 0.03) 51px),
+                repeating-linear-gradient(-45deg, transparent, transparent 50px, rgba(255, 152, 0, 0.03) 50px, rgba(255, 152, 0, 0.03) 51px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            text-align: center;
+            z-index: 1;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 
+                0 0 10px #ff5722,
+                0 0 20px #ff5722,
+                0 0 30px #ff9800;
+            animation: titlePulse 2s ease-in-out infinite;
+            letter-spacing: 2px;
+        }
+
+        @keyframes titlePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .subtitle {
+            font-size: 1.3em;
+            color: #ba68c8;
+            margin-bottom: 40px;
+            text-shadow: 0 0 10px rgba(186, 104, 200, 0.5);
+        }
+
+        .emoji-header {
+            font-size: 4em;
+            margin: 20px 0;
+            animation: bounce 1s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .levels-container {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            margin-top: 40px;
+        }
+
+        .level-card {
+            background: linear-gradient(135deg, rgba(74, 20, 140, 0.6) 0%, rgba(45, 27, 78, 0.8) 100%);
+            border: 3px solid #ff9800;
+            border-radius: 20px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 5px 15px rgba(0, 0, 0, 0.5),
+                0 0 20px rgba(255, 152, 0, 0.3);
+        }
+
+        .level-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent,
+                rgba(255, 152, 0, 0.1),
+                transparent
+            );
+            transform: rotate(45deg);
+            transition: all 0.5s;
+            opacity: 0;
+        }
+
+        .level-card:hover::before {
+            animation: shine 0.5s ease-in-out;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); opacity: 0; }
+        }
+
+        .level-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.6),
+                0 0 40px rgba(255, 152, 0, 0.5);
+            border-color: #ff5722;
+        }
+
+        .level-icon {
+            font-size: 3.5em;
+            margin-bottom: 15px;
+        }
+
+        .level-title {
+            font-size: 2em;
+            color: #ff9800;
+            margin: 10px 0;
+            text-shadow: 0 0 10px rgba(255, 152, 0, 0.7);
+        }
+
+        .level-description {
+            font-size: 1.1em;
+            color: #e0e0e0;
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+
+        .level-difficulty {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+
+        .difficulty-easy {
+            background: linear-gradient(45deg, #4caf50, #8bc34a);
+            color: #000;
+        }
+
+        .difficulty-medium {
+            background: linear-gradient(45deg, #ff9800, #ffc107);
+            color: #000;
+        }
+
+        .difficulty-hard {
+            background: linear-gradient(45deg, #f44336, #ff5722);
+            color: #fff;
+        }
+
+        .btn-enter {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 15px 40px;
+            background: linear-gradient(45deg, #ff9800, #ff5722);
+            color: #000;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.2em;
+            border-radius: 30px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(255, 152, 0, 0.4);
+            border: none;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+        }
+
+        .btn-enter:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(255, 152, 0, 0.6);
+        }
+
+        .floating-emoji {
+            position: fixed;
+            font-size: 2em;
+            pointer-events: none;
+            animation: float 10s infinite ease-in-out;
+            opacity: 0.3;
+            z-index: 0;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            33% { transform: translateY(-30px) rotate(120deg); }
+            66% { transform: translateY(30px) rotate(240deg); }
+        }
+
+        .instructions {
+            margin-top: 40px;
+            padding: 25px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            border: 2px solid #9c27b0;
+            font-size: 1em;
+            color: #ccc;
+            line-height: 1.8;
+        }
+
+        .instructions h3 {
+            color: #ff9800;
+            margin-top: 0;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2em; }
+            .level-title { font-size: 1.5em; }
+            .level-card { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Плавающие эмодзи на фоне -->
+    <div class="floating-emoji" style="top: 10%; left: 5%;">🎃</div>
+    <div class="floating-emoji" style="top: 20%; right: 10%; animation-delay: 2s;">👻</div>
+    <div class="floating-emoji" style="top: 60%; left: 8%; animation-delay: 4s;">🦇</div>
+    <div class="floating-emoji" style="bottom: 20%; right: 5%; animation-delay: 6s;">🕷️</div>
+    <div class="floating-emoji" style="top: 40%; right: 3%; animation-delay: 3s;">🍬</div>
+
+    <div class="container">
+        <div class="emoji-header">🎃👻</div>
+        <h1>ХЭЛЛОУИН: ПУТЬ ТЫКВЫ</h1>
+        <p class="subtitle">Программируй тыкву, собирай конфеты и найди выход! 🍬</p>
+
+        <div class="levels-container">
+            <!-- Junior Level -->
+            <div class="level-card" onclick="window.location.href='halloween(junior).html'">
+                <div class="level-icon">🌟</div>
+                <h2 class="level-title">Младший уровень (Junior)</h2>
+                <p class="level-description">
+                    Начни своё приключение! Простые уровни 4×4 и 5×5.<br>
+                    Идеально для начинающих программистов.
+                </p>
+                <span class="level-difficulty difficulty-easy">★ Лёгкий уровень</span>
+                <br>
+                <button class="btn-enter">▶ Начать игру</button>
+            </div>
+
+            <!-- Middle Level -->
+            <div class="level-card" onclick="window.location.href='halloween(midle).html'">
+                <div class="level-icon"></div>
+                <h2 class="level-title">Средний уровень (Middle)</h2>
+                <p class="level-description">
+                    Испытай свои навыки! Уровни 6×6 и 7×5 с большим количеством конфет.<br>
+                    Новые команды с повторениями!
+                </p>
+                <span class="level-difficulty difficulty-medium">★★ Средний уровень</span>
+                <br>
+                <button class="btn-enter">▶ Начать игру</button>
+            </div>
+
+            <!-- Senior Level -->
+            <div class="level-card" onclick="window.location.href='halloween(senior).html'">
+                <div class="level-icon">🔥</div>
+                <h2 class="level-title">Старший уровень (Senior)</h2>
+                <p class="level-description">
+                    Для настоящих мастеров! Сложные уровни до 10×10.<br>
+                    Команды движения до стены и много препятствий!
+                </p>
+                <span class="level-difficulty difficulty-hard">★★★ Сложный уровень</span>
+                <br>
+                <button class="btn-enter">▶ Начать игру</button>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h3>📜 Как играть:</h3>
+            <p>
+                1. Вводи команды: <b>вверх, вниз, влево, вправо</b><br>
+                2. Собирай все конфеты 🍬 и найди выход 🚪<br>
+                3. На средних и старших уровнях используй повторения: <b>вправо 3</b> или <b>вниз *</b> (до стены)<br>
+                4. Избегай стен  и не выходи за границы!<br>
+                <br>
+                <b>Удачи в Хэллоуинском приключении! 🎃👻</b>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Добавляем эффект свечения при движении мыши
+        document.addEventListener('mousemove', (e) => {
+            const cards = document.querySelectorAll('.level-card');
+            cards.forEach(card => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
+                    card.style.boxShadow = `
+                        0 0 ${30 + Math.random() * 20}px rgba(255, 152, 0, 0.6),
+                        0 10px 30px rgba(0, 0, 0, 0.6)
+                    `;
+                } else {
+                    card.style.boxShadow = `
+                        0 5px 15px rgba(0, 0, 0, 0.5),
+                        0 0 20px rgba(255, 152, 0, 0.3)
+                    `;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
