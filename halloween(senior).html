@@ -287,7 +287,7 @@
         </div>
         
         <div class="legend">
-            🎃 — Тыква (ты) &nbsp;|&nbsp; 🍬 — Конфета &nbsp;|&nbsp; 🚪 — Выход &nbsp;|&nbsp; 🪦 — Стена<br>
+            🎃 — Тыква (ты) &nbsp;|&nbsp; 🍬 — Конфета &nbsp;|&nbsp; 🚪 — Выход &nbsp;|&nbsp; 🕸️ — Стена<br>
             Управляй позицией через переменные <code>x</code> и <code>y</code><br>
             Поддерживается: <code>if</code>, <code>for</code>, <code>while</code>, <code>print()</code>, арифметика
         </div>
@@ -518,7 +518,7 @@ function render() {
             const cell = document.createElement('div');
             cell.className = 'cell';
             const val = mapData[y][x];
-            if (val === 1) { cell.classList.add('wall'); cell.textContent = '🪦'; }
+            if (val === 1) { cell.classList.add('wall'); cell.textContent = '🕸️'; }
             else if (val === 2) cell.textContent = '🍬';
             else if (val === 3) cell.textContent = '🚪';
 
