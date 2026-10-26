@@ -558,7 +558,7 @@
             <button class="action-btn btn-reset" onclick="resetLevel()">🔄 Сброс уровня</button>
             
             <div class="legend">
-                🎃 Тыква |  Конфета | 🚪 Выход | 🪦 Стена<br>
+                🎃 Тыква |  Конфета | 🚪 Выход | 🕸️ Стена<br>
                 Собери все 🍬 и дойди до 🚪!
             </div>
         </div>
@@ -745,7 +745,7 @@
         }
 
         function createFallingCandies() {
-            const emojis = ['🍬', '🍭', '👻', '️', '🎃', '🦇'];
+            const emojis = ['🍬', '🍭', '👻', '️🕷️', '🎃', '🦇'];
             for (let i = 0; i < 25; i++) {
                 setTimeout(() => {
                     const candy = document.createElement('div');
@@ -811,7 +811,7 @@
                     const val = mapData[y][x];
                     if (val === 1) {
                         cell.classList.add('wall');
-                        cell.textContent = '🪦';
+                        cell.textContent = '🕸️';
                     } else if (val === 2) {
                         cell.textContent = '🍬';
                     } else if (val === 3) {
